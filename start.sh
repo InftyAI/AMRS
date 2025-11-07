@@ -1,0 +1,1 @@
+eval $(poetry env activate)

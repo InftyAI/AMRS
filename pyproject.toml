@@ -1,21 +1,13 @@
 [tool.poetry]
-name = "llmlite"
-version = "0.0.15"
-description = "A library helps to chat with all kinds of LLMs consistently."
+name = "Astra"
+version = "0.0.1"
+description = ""
 authors = ["InftyAI"]
 license = "MIT License"
 readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.10"
-accelerate = "0.22.0"
-transformers = "4.34.0"
-sentencepiece = "0.1.99"
-pydantic = "<2"
-openai = "^0.28.0"
-vllm = "0.2.3"
-tokenizers = "0.14"
-torch = "^2.1.1"
 
 [tool.poetry.group.dev.dependencies]
 mypy = "^1.5.1"
@@ -37,5 +29,4 @@ filterwarnings = [
 [tool.mypy]
 exclude = [
     'tmp/',
-    'example/',
 ]

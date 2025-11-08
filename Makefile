@@ -31,4 +31,4 @@ build: lint
 
 .PHONY: publish
 publish: build
-	poetry publish --username=__token__ --password="$(INFTYAI_PYPI_TOKEN)"
+	poetry publish --username=__token__ --password=$(INFTYAI_PYPI_TOKEN)

@@ -30,10 +30,5 @@ build: lint
 	poetry build
 
 .PHONY: publish
-publish: build  export-requirements
-	poetry publish --username=__token__ --password=$(PYPI_TOKEN)
-
-.PHONEY: export-requirements
-export-requirements:
-	poetry export -f requirements.txt -o requirements.txt --without-hashes
-	poetry export -f requirements.txt -o requirements-dev.txt --without-hashes --with dev
+publish: build
+	poetry publish --username=__token__ --password="$(INFTYAI_PYPI_TOKEN)"

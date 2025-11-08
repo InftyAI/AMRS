@@ -1,7 +1,7 @@
 [tool.poetry]
-name = "Astra"
-version = "0.0.1"
-description = ""
+name = "AMRS"
+version = "0.0.0"
+description = "The adaptive model routing system for exploration and exploitation."
 authors = ["InftyAI"]
 license = "MIT License"
 readme = "README.md"

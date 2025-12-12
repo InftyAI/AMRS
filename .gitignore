@@ -12,3 +12,8 @@ __pycache__
 /temp/
 
 dist/
+
+
+# Added by cargo
+
+/target

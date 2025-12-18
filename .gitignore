@@ -12,6 +12,7 @@ __pycache__
 /temp/
 
 dist/
+.env
 
 
 # Added by cargo

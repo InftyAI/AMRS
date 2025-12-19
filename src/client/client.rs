@@ -28,12 +28,28 @@ pub struct Client {
 }
 
 impl Client {
-    pub fn new(config: &Config) -> Self {
+    pub fn new(config: Config) -> Self {
+        let mut cfg = config;
+        cfg.finalize().expect("Invalid configuration");
+
+        let providers = cfg
+            .models
+            .iter()
+            .map(|m| {
+                let provider = m
+                    .provider
+                    .as_ref()
+                    .expect("Model provider must be specified");
+
+                (m.id.clone(), provider::build_provider(provider, m))
+            })
+            .collect();
+
         Self {
-            config: config.clone(),
+            config: cfg.clone(),
             router_tracker: None,
-            providers: HashMap::new(),
-            router: router::build_router(&config.routing_mode, &config.models),
+            providers: providers,
+            router: router::build_router(cfg.routing_mode, cfg.models),
         }
     }
 
@@ -41,15 +57,6 @@ impl Client {
         if self.router_tracker.is_none() {
             self.router_tracker = Some(router::RouterTracker::new());
         }
-    }
-
-    pub fn build(&mut self) {
-        self.config.models.iter().for_each(|m| {
-            self.providers.insert(
-                m.id.clone(),
-                provider::build_provider(&m.provider.as_ref().unwrap(), m),
-            );
-        });
     }
 
     pub async fn create_response(

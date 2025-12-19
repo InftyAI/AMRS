@@ -6,11 +6,11 @@ use crate::provider::provider::ResponseRequest;
 use crate::router::random::RandomRouter;
 use crate::router::weight::WeightedRouter;
 
-pub fn build_router(mode: &RoutingMode, models: &[ModelConfig]) -> Box<dyn Router> {
+pub fn build_router(mode: RoutingMode, models: Vec<ModelConfig>) -> Box<dyn Router> {
     let model_ids: Vec<ModelId> = models.iter().map(|m| m.id.clone()).collect();
     match mode {
-        RoutingMode::Random => Box::new(RandomRouter::new(&model_ids)),
-        RoutingMode::Weighted => Box::new(WeightedRouter::new(&model_ids)),
+        RoutingMode::Random => Box::new(RandomRouter::new(model_ids)),
+        RoutingMode::Weighted => Box::new(WeightedRouter::new(model_ids)),
     }
 }
 

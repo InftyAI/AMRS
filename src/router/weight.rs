@@ -6,10 +6,8 @@ pub struct WeightedRouter {
 }
 
 impl WeightedRouter {
-    pub fn new(model_ids: &[ModelId]) -> Self {
-        Self {
-            model_ids: model_ids.to_vec(),
-        }
+    pub fn new(model_ids: Vec<ModelId>) -> Self {
+        Self { model_ids }
     }
 }
 

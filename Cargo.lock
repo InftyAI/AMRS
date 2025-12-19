@@ -3,10 +3,6 @@
 version = 4
 
 [[package]]
-<<<<<<< Updated upstream
-name = "AMRS"
-version = "0.1.0"
-=======
 name = "arms"
 version = "0.1.0"
 dependencies = [
@@ -2136,4 +2132,3 @@ dependencies = [
  "quote",
  "syn",
 ]
->>>>>>> Stashed changes

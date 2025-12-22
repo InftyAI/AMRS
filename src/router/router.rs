@@ -19,18 +19,14 @@ pub trait Router {
     fn sample(&self, input: &ResponseRequest) -> ModelId;
 }
 
-pub struct RouterTracker {
+pub struct RouterStats {
     total_requests: HashMap<ModelId, AtomicUsize>,
-    avg_latencies: HashMap<ModelId, AtomicUsize>,
-    total_tokens: HashMap<ModelId, AtomicUsize>,
 }
 
-impl RouterTracker {
-    pub fn new() -> Self {
-        RouterTracker {
+impl RouterStats {
+    pub fn default() -> Self {
+        RouterStats {
             total_requests: HashMap::new(),
-            avg_latencies: HashMap::new(),
-            total_tokens: HashMap::new(),
         }
     }
 }

@@ -40,9 +40,12 @@ impl Client {
 mod tests {
     use super::*;
     use crate::config::{Config, ModelConfig, RoutingMode};
+    use dotenvy::from_filename;
 
     #[test]
     fn test_client_new() {
+        from_filename(".env.test").ok();
+
         struct TestCase {
             name: &'static str,
             config: Config,

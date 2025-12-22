@@ -289,6 +289,8 @@ mod tests {
 
     #[test]
     fn test_populate_config() {
+        from_filename(".env.test").ok();
+
         let mut valid_cfg = Config::builder()
             .temperature(0.5)
             .max_output_tokens(1500)

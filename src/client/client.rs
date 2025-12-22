@@ -11,7 +11,7 @@ pub struct Client {
 }
 
 impl Client {
-    pub fn new(config: &Config) -> Self {
+    pub fn new(config: Config) -> Self {
         let mut cfg = config.clone();
         cfg.populate();
 
@@ -121,7 +121,7 @@ mod tests {
         ];
 
         for case in cases {
-            let mut client = Client::new(&case.config);
+            let mut client = Client::new(case.config.clone());
             if case.enabled_tracker {
                 client.enable_router_tracker();
             }

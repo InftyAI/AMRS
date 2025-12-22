@@ -19,13 +19,13 @@ impl Client {
         let providers = cfg
             .models
             .iter()
-            .map(|m| (m.id.clone(), provider::build_provider(m)))
+            .map(|m| (m.id.clone(), provider::construct_provider(m)))
             .collect();
 
         Self {
             router_tracker: None,
             providers: providers,
-            router: router::build_router(cfg.routing_mode, cfg.models),
+            router: router::construct_router(cfg.routing_mode, cfg.models),
         }
     }
 

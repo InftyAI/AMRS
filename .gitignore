@@ -18,3 +18,5 @@ dist/
 # Added by cargo
 
 /target
+.ruff_cache/
+.venv/

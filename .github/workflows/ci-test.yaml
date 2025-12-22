@@ -21,13 +21,12 @@ jobs:
       - name: Install uv
         run: pip install uv
 
-      - name: cd into backend directory
-        run: cd bindings/python
-
       - name: Install dependencies
+        working-directory: bindings/python
         run: source start.sh
 
       - name: Run tests
+        working-directory: bindings/python
         run: make test
 
       - name: Install docker-compose
@@ -37,6 +36,7 @@ jobs:
           docker-compose --version
 
       - name: Run integration tests
+        working-directory: bindings/python
         run: |
           make test-integration
 

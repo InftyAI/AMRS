@@ -15,6 +15,10 @@ impl RandomRouter {
 }
 
 impl Router for RandomRouter {
+    fn name(&self) -> &'static str {
+        "RandomRouter"
+    }
+
     fn sample(&self, _input: &ResponseRequest) -> ModelId {
         let mut rng = rand::rng();
         let idx = rng.random_range(0..self.model_ids.len());
@@ -25,6 +29,7 @@ impl Router for RandomRouter {
 #[cfg(test)]
 mod tests {
     use super::*;
+
     #[test]
     fn test_random_router_sampling() {
         let model_ids = vec!["model_a".to_string(), "model_b".to_string()];

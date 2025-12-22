@@ -50,6 +50,10 @@ impl OpenAIProvider {
 
 #[async_trait]
 impl Provider for OpenAIProvider {
+    fn name(&self) -> &'static str {
+        "OpenAIProvider"
+    }
+
     async fn create_response(&self, request: ResponseRequest) -> Result<ResponseResult, APIError> {
         let client = self.client.as_ref().unwrap();
         client.responses().create(request).await

@@ -87,6 +87,7 @@ impl Config {
         ConfigBuilder::default()
     }
 
+    // populate will fill in the missing model-specific configs with global configs.
     pub fn populate(&mut self) -> &mut Self {
         for model in &mut self.models {
             let model_url_exist = model.base_url.is_some();

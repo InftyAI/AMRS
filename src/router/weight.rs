@@ -12,6 +12,10 @@ impl WeightedRouter {
 }
 
 impl Router for WeightedRouter {
+    fn name(&self) -> &'static str {
+        "WeightedRouter"
+    }
+
     fn sample(&self, _input: &ResponseRequest) -> ModelId {
         // TODO: Implement weighted sampling logic
         return self.model_ids[0].clone();

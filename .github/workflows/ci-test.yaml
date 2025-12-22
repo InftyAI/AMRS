@@ -7,7 +7,21 @@ on:
       - synchronize
 
 jobs:
-  test-python:
+  test-rust-core:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          override: true
+
+      - name: Run tests
+        run: make test
+
+  test-python-binding:
     runs-on: ubuntu-latest
 
     steps:
@@ -39,17 +53,3 @@ jobs:
         working-directory: bindings/python
         run: |
           make test-integration
-
-  test-rust:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Set up Rust
-        uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
-          override: true
-
-      - name: Run tests
-        run: make test

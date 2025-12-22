@@ -23,7 +23,7 @@ lazy_static! {
 #[derive(Debug, Clone, PartialEq)]
 pub enum RoutingMode {
     Random,
-    Weighted,
+    WRR, // WeightedRoundRobin,
 }
 
 // ------------------ Model Config ------------------
@@ -131,7 +131,7 @@ impl ConfigBuilder {
 
         for model in self.models.as_ref().unwrap() {
             if self.routing_mode.is_some()
-                && self.routing_mode.as_ref().unwrap() == &RoutingMode::Weighted
+                && self.routing_mode.as_ref().unwrap() == &RoutingMode::WRR
                 && model.weight <= 0
             {
                 return Err(format!(

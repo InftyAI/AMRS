@@ -1,13 +1,12 @@
 use std::collections::HashMap;
 
-use crate::config::{Config, ModelConfig, ModelId, RoutingMode};
+use crate::config::{Config, ModelId};
 use crate::provider::provider;
 use crate::router::router;
 
 pub struct Client {
     providers: HashMap<ModelId, Box<dyn provider::Provider>>,
     router: Box<dyn router::Router>,
-    router_stats: router::RouterStats,
 }
 
 impl Client {
@@ -24,12 +23,11 @@ impl Client {
         Self {
             providers: providers,
             router: router::construct_router(cfg.routing_mode, cfg.models),
-            router_stats: router::RouterStats::default(),
         }
     }
 
     pub async fn create_response(
-        &self,
+        &mut self,
         request: provider::ResponseRequest,
     ) -> Result<provider::ResponseResult, provider::APIError> {
         let model_id = self.router.sample(&request);
@@ -41,6 +39,8 @@ impl Client {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::config::{Config, ModelConfig, RoutingMode};
+
     #[test]
     fn test_client_new() {
         struct TestCase {
@@ -64,9 +64,9 @@ mod tests {
                 expected_router_name: "RandomRouter",
             },
             TestCase {
-                name: "weighted router",
+                name: "weighted round-robin router",
                 config: Config::builder()
-                    .routing_mode(RoutingMode::Weighted)
+                    .routing_mode(RoutingMode::WRR)
                     .models(vec![
                         crate::config::ModelConfig::builder()
                             .id("model_a".to_string())

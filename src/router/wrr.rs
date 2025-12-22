@@ -23,7 +23,7 @@ impl WeightedRoundRobinRouter {
 
 impl Router for WeightedRoundRobinRouter {
     fn name(&self) -> &'static str {
-        "WeightedRouter"
+        "WeightedRoundRobinRouter"
     }
 
     // Use Smooth Weighted Round Robin Algorithm.

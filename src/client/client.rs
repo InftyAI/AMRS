@@ -85,7 +85,7 @@ mod tests {
                     ])
                     .build()
                     .unwrap(),
-                expected_router_name: "WeightedRouter",
+                expected_router_name: "WeightedRoundRobinRouter",
             },
             TestCase {
                 name: "router tracker enabled",

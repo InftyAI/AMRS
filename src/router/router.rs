@@ -4,7 +4,7 @@ use std::sync::atomic::AtomicUsize;
 use crate::config::{ModelConfig, ModelId, RoutingMode};
 use crate::provider::provider::ResponseRequest;
 use crate::router::random::RandomRouter;
-use crate::router::weight::WeightedRoundRobinRouter;
+use crate::router::wrr::WeightedRoundRobinRouter;
 
 #[derive(Debug, Clone)]
 pub struct ModelInfo {
@@ -55,6 +55,6 @@ mod tests {
         assert_eq!(random_router.name(), "RandomRouter");
 
         let weighted_router = construct_router(RoutingMode::WRR, model_configs.clone());
-        assert_eq!(weighted_router.name(), "WeightedRouter");
+        assert_eq!(weighted_router.name(), "WeightedRoundRobinRouter");
     }
 }

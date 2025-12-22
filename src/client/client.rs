@@ -5,48 +5,24 @@ use crate::config::ModelId;
 use crate::provider::provider;
 use crate::router::router;
 
-// ------------------ Chat Role ------------------
-#[derive(Debug, Clone)]
-pub enum ChatRole {
-    User,
-    Assistant,
-    System,
-}
-
-// ------------------ Message ------------------
-#[derive(Debug, Clone)]
-pub struct TextMessage {
-    pub role: ChatRole,
-    pub content: String,
-}
-
 pub struct Client {
-    config: Config,
     router_tracker: Option<router::RouterTracker>,
     router: Box<dyn router::Router>,
     providers: HashMap<ModelId, Box<dyn provider::Provider>>,
 }
 
 impl Client {
-    pub fn new(config: Config) -> Self {
-        let mut cfg = config;
-        cfg.finalize().expect("Invalid configuration");
+    pub fn new(config: &Config) -> Self {
+        let mut cfg = config.clone();
+        cfg.populate();
 
         let providers = cfg
             .models
             .iter()
-            .map(|m| {
-                let provider = m
-                    .provider
-                    .as_ref()
-                    .expect("Model provider must be specified");
-
-                (m.id.clone(), provider::build_provider(provider, m))
-            })
+            .map(|m| (m.id.clone(), provider::build_provider(m)))
             .collect();
 
         Self {
-            config: cfg.clone(),
             router_tracker: None,
             providers: providers,
             router: router::build_router(cfg.routing_mode, cfg.models),
@@ -64,7 +40,20 @@ impl Client {
         request: provider::ResponseRequest,
     ) -> Result<provider::ResponseResult, provider::APIError> {
         let model_id = self.router.sample(&request);
-        let provider = self.providers.get(model_id).unwrap();
+        let provider = self.providers.get(&model_id).unwrap();
         provider.create_response(request).await
     }
 }
+
+// // how to write test for this?
+
+// #[cfg(test)]
+// mod tests {
+//     use super::*;
+//     #[test]
+//     fn test_client_creation() {
+//         let config = Config::default();
+//         let client = Client::new(config);
+//         assert!(client.providers.len() > 0);
+//     }
+// }

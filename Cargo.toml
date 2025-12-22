@@ -6,6 +6,7 @@ edition = "2024"
 [dependencies]
 async-openai = { version = "0.31.1", features = ["_api", "response-types", "responses",] }
 async-trait = "0.1.89"
+derive_builder = "0.20.2"
 dotenvy = "0.15.7"
 lazy_static = "1.5.0"
 rand = "0.9.2"

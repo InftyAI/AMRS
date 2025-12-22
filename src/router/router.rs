@@ -15,7 +15,7 @@ pub fn build_router(mode: RoutingMode, models: Vec<ModelConfig>) -> Box<dyn Rout
 }
 
 pub trait Router {
-    fn sample(&self, input: &ResponseRequest) -> &ModelId;
+    fn sample(&self, input: &ResponseRequest) -> ModelId;
 }
 
 pub struct RouterTracker {

@@ -3,7 +3,6 @@ mod router {
     pub mod router;
     mod weight;
 }
-mod config;
 mod client {
     pub mod client;
 }
@@ -12,5 +11,5 @@ mod provider {
     pub mod provider;
 }
 
+pub mod config;
 pub use crate::client::client::Client;
-pub use crate::config::Config;

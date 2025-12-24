@@ -14,6 +14,9 @@ Thanks to [async-openai](https://github.com/64bit/async-openai), AMRS builds on 
   - **UCB**: Upper Confidence Bound based model selection (coming soon).
   - **Adaptive**: Dynamically selects models based on performance metrics (coming soon).
 
+- Broad provider support:
+  - OpenAI compatible providers (DeepInfra, OpenRouter, etc.)
+  - More on the way
 
 ## How to use
 

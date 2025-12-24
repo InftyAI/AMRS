@@ -17,5 +17,5 @@ mod provider {
 pub use crate::client::client::Client;
 pub use crate::config::{Config, ModelConfig, RoutingMode};
 pub use crate::provider::provider::{
-    APIError, CreateResponseArgs, CreateResponseInput, CreateResponseOutput,
+    APIError, CreateResponseArgs, CreateResponseReq, CreateResponseRes,
 };

@@ -4,7 +4,7 @@ use derive_builder::Builder;
 
 use crate::config::{ModelConfig, ModelId};
 use crate::provider::provider::{
-    APIError, CreateResponseInput, CreateResponseOutput, Provider, validate_request,
+    APIError, CreateResponseReq, CreateResponseRes, Provider, validate_request,
 };
 
 #[derive(Debug, Clone, Builder)]
@@ -53,8 +53,8 @@ impl Provider for OpenAIProvider {
 
     async fn create_response(
         &self,
-        request: CreateResponseInput,
-    ) -> Result<CreateResponseOutput, APIError> {
+        request: CreateResponseReq,
+    ) -> Result<CreateResponseRes, APIError> {
         validate_request(&request)?;
         self.client.responses().create(request).await
     }

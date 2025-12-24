@@ -28,8 +28,8 @@ impl Client {
 
     pub async fn create_response(
         &mut self,
-        request: provider::CreateResponseInput,
-    ) -> Result<provider::CreateResponseOutput, provider::APIError> {
+        request: provider::CreateResponseReq,
+    ) -> Result<provider::CreateResponseRes, provider::APIError> {
         let model_id = self.router.sample(&request);
         let provider = self.providers.get(&model_id).unwrap();
         provider.create_response(request).await

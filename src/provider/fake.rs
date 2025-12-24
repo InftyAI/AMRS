@@ -10,7 +10,7 @@ use reqwest::header::HeaderName;
 
 use crate::config::{ModelConfig, ModelId};
 use crate::provider::provider::{
-    APIError, CreateResponseInput, CreateResponseOutput, Provider, validate_request,
+    APIError, CreateResponseReq, CreateResponseRes, Provider, validate_request,
 };
 
 pub struct FakeProvider {
@@ -33,11 +33,11 @@ impl Provider for FakeProvider {
 
     async fn create_response(
         &self,
-        request: CreateResponseInput,
-    ) -> Result<CreateResponseOutput, APIError> {
+        request: CreateResponseReq,
+    ) -> Result<CreateResponseRes, APIError> {
         validate_request(&request)?;
 
-        Ok(CreateResponseOutput {
+        Ok(CreateResponseRes {
             id: "fake-response-id".to_string(),
             object: "text_completion".to_string(),
             model: self.model.clone(),

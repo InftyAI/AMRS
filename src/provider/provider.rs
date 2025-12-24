@@ -8,9 +8,9 @@ use crate::config::ModelConfig;
 use crate::provider::fake::FakeProvider;
 use crate::provider::openai::OpenAIProvider;
 
-pub type CreateResponseInput = CreateResponse;
+pub type CreateResponseReq = CreateResponse;
 pub type CreateResponseArgs = OpenAICreateResponseArgs;
-pub type CreateResponseOutput = Response;
+pub type CreateResponseRes = Response;
 pub type APIError = OpenAI_Error;
 
 pub fn construct_provider(config: ModelConfig) -> Box<dyn Provider> {
@@ -27,11 +27,11 @@ pub trait Provider: Send + Sync {
     fn name(&self) -> &'static str;
     async fn create_response(
         &self,
-        request: CreateResponseInput,
-    ) -> Result<CreateResponseOutput, APIError>;
+        request: CreateResponseReq,
+    ) -> Result<CreateResponseRes, APIError>;
 }
 
-pub fn validate_request(request: &CreateResponseInput) -> Result<(), APIError> {
+pub fn validate_request(request: &CreateResponseReq) -> Result<(), APIError> {
     if request.model.is_some() {
         return Err(APIError::InvalidArgument(
             "Model ID must be specified in the config".to_string(),

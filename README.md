@@ -17,7 +17,7 @@ Thanks to [async-openai](https://github.com/64bit/async-openai), AMRS builds on 
 
 ## How to use
 
-Here's a simple example with random routing mode:
+Here's a simple example with the Weighted Round Robin (WRR) routing mode:
 
 
 ```rust
@@ -28,16 +28,18 @@ use arms::{Client, Config, ModelConfig, CreateResponseArgs, RoutingMode};
 
 let config = Config::builder()
     .provider("openai")
-    .routing_mode(RoutingMode::Random)
+    .routing_mode(RoutingMode::WRR)
     .model(
         ModelConfig::builder()
             .id("gpt-3.5-turbo")
+            .weight(2)
             .build()
             .unwrap(),
     )
     .model(
         ModelConfig::builder()
             .id("gpt-4")
+            .weight(1)
             .build()
             .unwrap(),
     )

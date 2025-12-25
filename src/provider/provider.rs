@@ -1,17 +1,10 @@
-use async_openai::error::OpenAIError as OpenAI_Error;
-use async_openai::types::responses::{
-    CreateResponse, CreateResponseArgs as OpenAICreateResponseArgs, Response,
-};
 use async_trait::async_trait;
 
-use crate::config::ModelConfig;
+use crate::client::config::ModelConfig;
 use crate::provider::fake::FakeProvider;
 use crate::provider::openai::OpenAIProvider;
-
-pub type CreateResponseReq = CreateResponse;
-pub type CreateResponseArgs = OpenAICreateResponseArgs;
-pub type CreateResponseRes = Response;
-pub type APIError = OpenAI_Error;
+use crate::types::error::OpenAIError;
+use crate::types::responses::{CreateResponse, Response};
 
 pub fn construct_provider(config: ModelConfig) -> Box<dyn Provider> {
     let provider = config.provider.as_ref().unwrap();
@@ -25,15 +18,12 @@ pub fn construct_provider(config: ModelConfig) -> Box<dyn Provider> {
 #[async_trait]
 pub trait Provider: Send + Sync {
     fn name(&self) -> &'static str;
-    async fn create_response(
-        &self,
-        request: CreateResponseReq,
-    ) -> Result<CreateResponseRes, APIError>;
+    async fn create_response(&self, request: CreateResponse) -> Result<Response, OpenAIError>;
 }
 
-pub fn validate_request(request: &CreateResponseReq) -> Result<(), APIError> {
+pub fn validate_request(request: &CreateResponse) -> Result<(), OpenAIError> {
     if request.model.is_some() {
-        return Err(APIError::InvalidArgument(
+        return Err(OpenAIError::InvalidArgument(
             "Model Name must be specified in the config".to_string(),
         ));
     }

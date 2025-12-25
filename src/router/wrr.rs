@@ -1,5 +1,6 @@
+use crate::client::config::ModelName;
 use crate::router::router::{ModelInfo, Router};
-use crate::{config::ModelName, provider::provider::CreateResponseReq};
+use crate::types::responses::CreateResponse;
 
 pub struct WeightedRoundRobinRouter {
     total_weight: i32,
@@ -27,7 +28,7 @@ impl Router for WeightedRoundRobinRouter {
     }
 
     // Use Smooth Weighted Round Robin Algorithm.
-    fn sample(&mut self, _input: &CreateResponseReq) -> ModelName {
+    fn sample(&mut self, _input: &CreateResponse) -> ModelName {
         // return early if only one model.
         if self.model_infos.len() == 1 {
             return self.model_infos[0].name.clone();
@@ -76,7 +77,7 @@ mod tests {
         let mut wrr = WeightedRoundRobinRouter::new(model_infos.clone());
         let mut counts = HashMap::new();
         for _ in 0..1000 {
-            let sampled_id = wrr.sample(&CreateResponseReq::default());
+            let sampled_id = wrr.sample(&CreateResponse::default());
             *counts.entry(sampled_id.clone()).or_insert(0) += 1;
         }
         assert!(counts.len() == model_infos.len());

@@ -5,7 +5,6 @@ use derive_builder::Builder;
 use lazy_static::lazy_static;
 
 // ------------------ Provider ------------------
-pub type ProviderName = String;
 const OPENAI_PROVIDER: &str = "OPENAI";
 
 lazy_static! {
@@ -38,7 +37,7 @@ pub struct ModelConfig {
     #[builder(default = "None")]
     pub(crate) base_url: Option<String>,
     #[builder(default = "None", setter(custom))]
-    pub(crate) provider: Option<ProviderName>,
+    pub(crate) provider: Option<String>,
     #[builder(default = "None")]
     pub(crate) temperature: Option<f32>,
     #[builder(default = "None")]
@@ -85,8 +84,8 @@ pub struct Config {
     // global configs for models, will be overridden by model-specific configs
     #[builder(default = "https://api.openai.com/v1".to_string())]
     pub(crate) base_url: String,
-    #[builder(default = "ProviderName::from(OPENAI_PROVIDER)", setter(custom))]
-    pub(crate) provider: ProviderName,
+    #[builder(default = "OPENAI_PROVIDER.to_string()", setter(custom))]
+    pub(crate) provider: String,
     #[builder(default = "0.8")]
     pub(crate) temperature: f32,
     #[builder(default = "1024")]
@@ -195,7 +194,7 @@ impl ConfigBuilder {
                     "{}_API_KEY",
                     self.provider
                         .as_ref()
-                        .unwrap_or(&ProviderName::from(OPENAI_PROVIDER))
+                        .unwrap_or(&OPENAI_PROVIDER.to_string())
                         .to_uppercase()
                 );
                 if env::var(&env_var).is_err() {
@@ -203,7 +202,7 @@ impl ConfigBuilder {
                         "API key for provider '{}' not found in environment variable '{}'",
                         self.provider
                             .as_ref()
-                            .unwrap_or(&ProviderName::from(OPENAI_PROVIDER))
+                            .unwrap_or(&OPENAI_PROVIDER.to_string())
                             .to_uppercase(),
                         env_var
                     ));

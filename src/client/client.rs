@@ -1,8 +1,10 @@
 use std::collections::HashMap;
 
-use crate::config::{Config, ModelName};
+use crate::client::config::{Config, ModelName};
 use crate::provider::provider;
 use crate::router::router;
+use crate::types::error::OpenAIError;
+use crate::types::responses::{CreateResponse, Response};
 
 pub struct Client {
     providers: HashMap<ModelName, Box<dyn provider::Provider>>,
@@ -28,8 +30,8 @@ impl Client {
 
     pub async fn create_response(
         &mut self,
-        request: provider::CreateResponseReq,
-    ) -> Result<provider::CreateResponseRes, provider::APIError> {
+        request: CreateResponse,
+    ) -> Result<Response, OpenAIError> {
         let candidate = self.router.sample(&request);
         let provider = self.providers.get(&candidate).unwrap();
         provider.create_response(request).await
@@ -39,7 +41,7 @@ impl Client {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::config::{Config, ModelConfig, RoutingMode};
+    use crate::client::config::{Config, ModelConfig, RoutingMode};
     use dotenvy::from_filename;
 
     #[test]
@@ -71,14 +73,14 @@ mod tests {
                 config: Config::builder()
                     .routing_mode(RoutingMode::WRR)
                     .models(vec![
-                        crate::config::ModelConfig::builder()
+                        crate::client::config::ModelConfig::builder()
                             .name("model_a".to_string())
                             .provider(Some("openai".to_string()))
                             .base_url(Some("https://api.openai.com/v1".to_string()))
                             .weight(1)
                             .build()
                             .unwrap(),
-                        crate::config::ModelConfig::builder()
+                        crate::client::config::ModelConfig::builder()
                             .name("model_b".to_string())
                             .provider(Some("openai".to_string()))
                             .base_url(Some("https://api.openai.com/v1".to_string()))

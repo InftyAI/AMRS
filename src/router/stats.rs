@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 use std::sync::atomic::{AtomicUsize, Ordering};
 
-use crate::config::ModelName;
+use crate::client::config::ModelName;
 
 pub struct RouterStats {
     requests_per_model: HashMap<ModelName, AtomicUsize>,

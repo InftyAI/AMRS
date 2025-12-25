@@ -1,6 +1,7 @@
 use dotenvy::from_filename;
 
-use arms::{Client, Config, CreateResponseArgs, ModelConfig, RoutingMode};
+use arms::client::{Client, Config, ModelConfig, RoutingMode};
+use arms::types::responses::CreateResponseArgs;
 
 #[cfg(test)]
 mod tests {

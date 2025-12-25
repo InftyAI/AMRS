@@ -2,10 +2,10 @@ use async_openai::{Client, config::OpenAIConfig};
 use async_trait::async_trait;
 use derive_builder::Builder;
 
-use crate::config::{ModelConfig, ModelName};
-use crate::provider::provider::{
-    APIError, CreateResponseReq, CreateResponseRes, Provider, validate_request,
-};
+use crate::client::config::{ModelConfig, ModelName};
+use crate::provider::provider::{Provider, validate_request};
+use crate::types::error::OpenAIError;
+use crate::types::responses::{CreateResponse, Response};
 
 #[derive(Debug, Clone, Builder)]
 #[builder(pattern = "mutable", build_fn(skip))]
@@ -51,10 +51,7 @@ impl Provider for OpenAIProvider {
         "OpenAIProvider"
     }
 
-    async fn create_response(
-        &self,
-        request: CreateResponseReq,
-    ) -> Result<CreateResponseRes, APIError> {
+    async fn create_response(&self, request: CreateResponse) -> Result<Response, OpenAIError> {
         validate_request(&request)?;
         self.client.responses().create(request).await
     }

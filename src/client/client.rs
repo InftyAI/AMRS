@@ -1,11 +1,11 @@
 use std::collections::HashMap;
 
-use crate::config::{Config, ModelId};
+use crate::config::{Config, ModelName};
 use crate::provider::provider;
 use crate::router::router;
 
 pub struct Client {
-    providers: HashMap<ModelId, Box<dyn provider::Provider>>,
+    providers: HashMap<ModelName, Box<dyn provider::Provider>>,
     router: Box<dyn router::Router>,
 }
 
@@ -17,7 +17,7 @@ impl Client {
         let providers = cfg
             .models
             .iter()
-            .map(|m| (m.id.clone(), provider::construct_provider(m.clone())))
+            .map(|m| (m.name.clone(), provider::construct_provider(m.clone())))
             .collect();
 
         Self {
@@ -30,8 +30,8 @@ impl Client {
         &mut self,
         request: provider::CreateResponseReq,
     ) -> Result<provider::CreateResponseRes, provider::APIError> {
-        let model_id = self.router.sample(&request);
-        let provider = self.providers.get(&model_id).unwrap();
+        let candidate = self.router.sample(&request);
+        let provider = self.providers.get(&candidate).unwrap();
         provider.create_response(request).await
     }
 }
@@ -58,7 +58,7 @@ mod tests {
                 config: Config::builder()
                     .models(vec![
                         ModelConfig::builder()
-                            .id("model_c".to_string())
+                            .name("model_c".to_string())
                             .build()
                             .unwrap(),
                     ])
@@ -72,14 +72,14 @@ mod tests {
                     .routing_mode(RoutingMode::WRR)
                     .models(vec![
                         crate::config::ModelConfig::builder()
-                            .id("model_a".to_string())
+                            .name("model_a".to_string())
                             .provider(Some("openai".to_string()))
                             .base_url(Some("https://api.openai.com/v1".to_string()))
                             .weight(1)
                             .build()
                             .unwrap(),
                         crate::config::ModelConfig::builder()
-                            .id("model_b".to_string())
+                            .name("model_b".to_string())
                             .provider(Some("openai".to_string()))
                             .base_url(Some("https://api.openai.com/v1".to_string()))
                             .weight(3)
@@ -95,13 +95,13 @@ mod tests {
                 config: Config::builder()
                     .models(vec![
                         ModelConfig::builder()
-                            .id("model_a".to_string())
+                            .name("model_a".to_string())
                             .provider(Some("openai".to_string()))
                             .base_url(Some("https://api.openai.com/v1".to_string()))
                             .build()
                             .unwrap(),
                         ModelConfig::builder()
-                            .id("model_b".to_string())
+                            .name("model_b".to_string())
                             .provider(Some("openai".to_string()))
                             .base_url(Some("https://api.openai.com/v1".to_string()))
                             .build()

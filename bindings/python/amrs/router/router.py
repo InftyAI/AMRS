@@ -7,11 +7,11 @@ class ModelInfo:
     average_latency: float = 0.0
 
 class Router(abc.ABC):
-    def __init__(self, model_list: list[config.ModelID]):
+    def __init__(self, model_list: list[config.ModelName]):
         self._model_list = model_list
 
     @abc.abstractmethod
-    def sample(self, content: str) -> config.ModelID:
+    def sample(self, content: str) -> config.ModelName:
         pass
 
 def new_router(model_cfgs: list[config.ModelConfig], mode: config.RoutingMode) -> Router:

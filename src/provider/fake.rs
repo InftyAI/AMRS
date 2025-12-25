@@ -8,19 +8,19 @@ use async_openai::{Client, config::OpenAIConfig};
 use async_trait::async_trait;
 use reqwest::header::HeaderName;
 
-use crate::config::{ModelConfig, ModelId};
+use crate::config::{ModelConfig, ModelName};
 use crate::provider::provider::{
     APIError, CreateResponseReq, CreateResponseRes, Provider, validate_request,
 };
 
 pub struct FakeProvider {
-    model: ModelId,
+    model: ModelName,
 }
 
 impl FakeProvider {
     pub fn new(config: ModelConfig) -> Self {
         Self {
-            model: config.id.clone(),
+            model: config.name.clone(),
         }
     }
 }

@@ -1,6 +1,6 @@
 use rand::Rng;
 
-use crate::config::ModelId;
+use crate::config::ModelName;
 use crate::provider::provider::CreateResponseReq;
 use crate::router::router::{ModelInfo, Router};
 
@@ -19,10 +19,10 @@ impl Router for RandomRouter {
         "RandomRouter"
     }
 
-    fn sample(&mut self, _input: &CreateResponseReq) -> ModelId {
+    fn sample(&mut self, _input: &CreateResponseReq) -> ModelName {
         let mut rng = rand::rng();
         let idx = rng.random_range(0..self.model_infos.len());
-        self.model_infos[idx].id.clone()
+        self.model_infos[idx].name.clone()
     }
 }
 
@@ -34,15 +34,15 @@ mod tests {
     fn test_random_router_sampling() {
         let model_infos = vec![
             ModelInfo {
-                id: "model_x".to_string(),
+                name: "model_x".to_string(),
                 weight: 1,
             },
             ModelInfo {
-                id: "model_y".to_string(),
+                name: "model_y".to_string(),
                 weight: 2,
             },
             ModelInfo {
-                id: "model_z".to_string(),
+                name: "model_z".to_string(),
                 weight: 3,
             },
         ];
@@ -50,8 +50,8 @@ mod tests {
         let mut counts = std::collections::HashMap::new();
 
         for _ in 0..1000 {
-            let sampled_id = router.sample(&CreateResponseReq::default());
-            *counts.entry(sampled_id.clone()).or_insert(0) += 1;
+            let candidate = router.sample(&CreateResponseReq::default());
+            *counts.entry(candidate.clone()).or_insert(0) += 1;
         }
         assert!(counts.len() == model_infos.len());
         for count in counts.values() {

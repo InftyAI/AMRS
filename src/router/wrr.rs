@@ -1,5 +1,5 @@
 use crate::router::router::{ModelInfo, Router};
-use crate::{config::ModelId, provider::provider::CreateResponseReq};
+use crate::{config::ModelName, provider::provider::CreateResponseReq};
 
 pub struct WeightedRoundRobinRouter {
     total_weight: i32,
@@ -27,10 +27,10 @@ impl Router for WeightedRoundRobinRouter {
     }
 
     // Use Smooth Weighted Round Robin Algorithm.
-    fn sample(&mut self, _input: &CreateResponseReq) -> ModelId {
+    fn sample(&mut self, _input: &CreateResponseReq) -> ModelName {
         // return early if only one model.
         if self.model_infos.len() == 1 {
-            return self.model_infos[0].id.clone();
+            return self.model_infos[0].name.clone();
         }
 
         self.current_weights
@@ -48,7 +48,7 @@ impl Router for WeightedRoundRobinRouter {
         }
 
         self.current_weights[max_index] -= self.total_weight;
-        self.model_infos[max_index].id.clone()
+        self.model_infos[max_index].name.clone()
     }
 }
 
@@ -61,15 +61,15 @@ mod tests {
     fn test_weighted_round_robin_sampling() {
         let model_infos = vec![
             ModelInfo {
-                id: "model_x".to_string(),
+                name: "model_x".to_string(),
                 weight: 1,
             },
             ModelInfo {
-                id: "model_y".to_string(),
+                name: "model_y".to_string(),
                 weight: 3,
             },
             ModelInfo {
-                id: "model_z".to_string(),
+                name: "model_z".to_string(),
                 weight: 6,
             },
         ];

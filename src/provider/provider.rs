@@ -34,7 +34,7 @@ pub trait Provider: Send + Sync {
 pub fn validate_request(request: &CreateResponseReq) -> Result<(), APIError> {
     if request.model.is_some() {
         return Err(APIError::InvalidArgument(
-            "Model ID must be specified in the config".to_string(),
+            "Model Name must be specified in the config".to_string(),
         ));
     }
     Ok(())
@@ -56,7 +56,7 @@ mod tests {
             TestCase {
                 name: "OpenAI Provider",
                 config: ModelConfig::builder()
-                    .id("test-model".to_string())
+                    .name("test-model".to_string())
                     .provider(Some("openai".to_string()))
                     .base_url(Some("https://api.openai.com/v1".to_string()))
                     .build()
@@ -66,7 +66,7 @@ mod tests {
             TestCase {
                 name: "Unsupported Provider",
                 config: ModelConfig::builder()
-                    .id("test-model".to_string())
+                    .name("test-model".to_string())
                     .provider(Some("unsupported".to_string()))
                     .base_url(Some("https://api.openai.com/v1".to_string()))
                     .build()

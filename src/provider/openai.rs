@@ -2,7 +2,7 @@ use async_openai::{Client, config::OpenAIConfig};
 use async_trait::async_trait;
 use derive_builder::Builder;
 
-use crate::config::{ModelConfig, ModelId};
+use crate::config::{ModelConfig, ModelName};
 use crate::provider::provider::{
     APIError, CreateResponseReq, CreateResponseRes, Provider, validate_request,
 };
@@ -10,7 +10,7 @@ use crate::provider::provider::{
 #[derive(Debug, Clone, Builder)]
 #[builder(pattern = "mutable", build_fn(skip))]
 pub struct OpenAIProvider {
-    model: ModelId,
+    model: ModelName,
     config: OpenAIConfig,
     client: Client<OpenAIConfig>,
 }
@@ -28,7 +28,7 @@ impl OpenAIProvider {
             .with_api_key(api_key);
 
         OpenAIProviderBuilder {
-            model: Some(config.id.clone()),
+            model: Some(config.name.clone()),
             config: Some(openai_config),
             client: None,
         }

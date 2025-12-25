@@ -29,7 +29,7 @@ pub enum RoutingMode {
 }
 
 // ------------------ Model Config ------------------
-pub type ModelId = String;
+pub type ModelName = String;
 
 #[derive(Debug, Clone, Builder)]
 #[builder(build_fn(validate = "Self::validate"), pattern = "mutable")]
@@ -45,14 +45,14 @@ pub struct ModelConfig {
     pub(crate) max_output_tokens: Option<usize>,
 
     #[builder(setter(custom))]
-    pub(crate) id: ModelId,
+    pub(crate) name: ModelName,
     #[builder(default=-1)]
     pub(crate) weight: i32,
 }
 
 impl ModelConfigBuilder {
-    pub fn id<S: AsRef<str>>(&mut self, name: S) -> &mut Self {
-        self.id = Some(name.as_ref().to_string());
+    pub fn name<S: AsRef<str>>(&mut self, name: S) -> &mut Self {
+        self.name = Some(name.as_ref().to_string());
         self
     }
 
@@ -65,8 +65,8 @@ impl ModelConfigBuilder {
     }
 
     fn validate(&self) -> Result<(), String> {
-        if self.id.is_none() {
-            return Err("Model id must be provided.".to_string());
+        if self.name.is_none() {
+            return Err("Model name must be provided.".to_string());
         }
         Ok(())
     }
@@ -157,7 +157,7 @@ impl ConfigBuilder {
             {
                 return Err(format!(
                     "Model '{}' weight must be non-negative in Weighted routing mode.",
-                    model.id
+                    model.name
                 ));
             }
 
@@ -165,7 +165,7 @@ impl ConfigBuilder {
                 if max_output_tokens <= 0 {
                     return Err(format!(
                         "Model '{}' max_output_tokens must be positive.",
-                        model.id
+                        model.name
                     ));
                 }
             }
@@ -174,7 +174,7 @@ impl ConfigBuilder {
                 if temperature < 0.0 || temperature > 1.0 {
                     return Err(format!(
                         "Model '{}' temperature must be between 0.0 and 1.0.",
-                        model.id
+                        model.name
                     ));
                 }
             }
@@ -229,7 +229,7 @@ mod tests {
         let valid_simplest_models_cfg = Config::builder()
             .model(
                 ModelConfig::builder()
-                    .id("gpt-4".to_string())
+                    .name("gpt-4".to_string())
                     .build()
                     .unwrap(),
             )
@@ -259,11 +259,11 @@ mod tests {
         let valid_cfg = Config::builder()
             .models(vec![
                 ModelConfig::builder()
-                    .id("gpt-3.5-turbo".to_string())
+                    .name("gpt-3.5-turbo".to_string())
                     .build()
                     .unwrap(),
                 ModelConfig::builder()
-                    .id("gpt-4".to_string())
+                    .name("gpt-4".to_string())
                     .build()
                     .unwrap(),
             ])
@@ -275,7 +275,7 @@ mod tests {
         let invalid_cfg_with_no_api_key = Config::builder()
             .model(
                 ModelConfig::builder()
-                    .id("some-model".to_string())
+                    .name("some-model".to_string())
                     .build()
                     .unwrap(),
             )
@@ -290,7 +290,7 @@ mod tests {
             .max_output_tokens(2048)
             .model(
                 ModelConfig::builder()
-                    .id("custom-model")
+                    .name("custom-model")
                     .provider(Some("AMRS"))
                     .build()
                     .unwrap(),
@@ -303,7 +303,7 @@ mod tests {
         assert!(invalid_empty_models_cfg.is_err());
 
         // case 6:
-        print!("validating invalid empty model id config");
+        print!("validating invalid empty model name config");
         let invalid_empty_model_id_cfg = ModelConfig::builder().build();
         assert!(invalid_empty_model_id_cfg.is_err());
     }
@@ -317,7 +317,7 @@ mod tests {
             .max_output_tokens(1500)
             .model(
                 ModelConfig::builder()
-                    .id("model-1".to_string())
+                    .name("model-1".to_string())
                     .build()
                     .unwrap(),
             )
@@ -338,7 +338,7 @@ mod tests {
         let mut valid_specified_cfg = Config::builder()
             .provider("AMRS".to_string())
             .base_url("http://custom-api.ai".to_string())
-            .model(ModelConfig::builder().id("model-2").build().unwrap())
+            .model(ModelConfig::builder().name("model-2").build().unwrap())
             .build();
         valid_specified_cfg.as_mut().unwrap().populate();
 

@@ -1,14 +1,14 @@
 use std::collections::HashMap;
 use std::sync::atomic::AtomicUsize;
 
-use crate::config::{ModelConfig, ModelId, RoutingMode};
+use crate::config::{ModelConfig, ModelName, RoutingMode};
 use crate::provider::provider::CreateResponseReq;
 use crate::router::random::RandomRouter;
 use crate::router::wrr::WeightedRoundRobinRouter;
 
 #[derive(Debug, Clone)]
 pub struct ModelInfo {
-    pub id: ModelId,
+    pub name: ModelName,
     pub weight: i32,
 }
 
@@ -16,7 +16,7 @@ pub fn construct_router(mode: RoutingMode, models: Vec<ModelConfig>) -> Box<dyn 
     let model_infos: Vec<ModelInfo> = models
         .iter()
         .map(|m| ModelInfo {
-            id: m.id.clone(),
+            name: m.name.clone(),
             weight: m.weight.clone(),
         })
         .collect();
@@ -28,7 +28,7 @@ pub fn construct_router(mode: RoutingMode, models: Vec<ModelConfig>) -> Box<dyn 
 
 pub trait Router {
     fn name(&self) -> &'static str;
-    fn sample(&mut self, input: &CreateResponseReq) -> ModelId;
+    fn sample(&mut self, input: &CreateResponseReq) -> ModelName;
 }
 
 #[cfg(test)]
@@ -38,13 +38,13 @@ mod tests {
     fn test_router_construction() {
         let model_configs = vec![
             ModelConfig::builder()
-                .id("model_a".to_string())
+                .name("model_a".to_string())
                 .provider(Some("openai".to_string()))
                 .base_url(Some("https://api.openai.com/v1".to_string()))
                 .build()
                 .unwrap(),
             ModelConfig::builder()
-                .id("model_b".to_string())
+                .name("model_b".to_string())
                 .provider(Some("openai".to_string()))
                 .base_url(Some("https://api.openai.com/v1".to_string()))
                 .build()

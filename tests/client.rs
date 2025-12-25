@@ -13,7 +13,7 @@ mod tests {
         // case 1: one model.
         let config = Config::builder()
             .provider("fake")
-            .model(ModelConfig::builder().id("fake-model").build().unwrap())
+            .model(ModelConfig::builder().name("fake-model").build().unwrap())
             .build()
             .unwrap();
 
@@ -30,7 +30,12 @@ mod tests {
         // case 2: specify model in request.
         let config = Config::builder()
             .provider("openai")
-            .model(ModelConfig::builder().id("gpt-3.5-turbo").build().unwrap())
+            .model(
+                ModelConfig::builder()
+                    .name("gpt-3.5-turbo")
+                    .build()
+                    .unwrap(),
+            )
             .build()
             .unwrap();
         let mut client = Client::new(config);
@@ -48,14 +53,14 @@ mod tests {
             .routing_mode(RoutingMode::WRR)
             .model(
                 ModelConfig::builder()
-                    .id("gpt-3.5-turbo")
+                    .name("gpt-3.5-turbo")
                     .weight(1)
                     .build()
                     .unwrap(),
             )
             .model(
                 ModelConfig::builder()
-                    .id("gpt-4")
+                    .name("gpt-4")
                     .weight(1)
                     .build()
                     .unwrap(),

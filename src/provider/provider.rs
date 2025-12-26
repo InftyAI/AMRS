@@ -1,23 +1,21 @@
-use async_openai::error::OpenAIError as OpenAI_Error;
-use async_openai::types::responses::{
-    CreateResponse, CreateResponseArgs as OpenAICreateResponseArgs, Response,
-};
 use async_trait::async_trait;
 
-use crate::config::ModelConfig;
-use crate::provider::fake::FakeProvider;
+use crate::client::config::ModelConfig;
+use crate::provider::faker::FakerProvider;
 use crate::provider::openai::OpenAIProvider;
-
-pub type CreateResponseReq = CreateResponse;
-pub type CreateResponseArgs = OpenAICreateResponseArgs;
-pub type CreateResponseRes = Response;
-pub type APIError = OpenAI_Error;
+use crate::types::error::OpenAIError;
+use crate::types::responses::{CreateResponse, Response};
 
 pub fn construct_provider(config: ModelConfig) -> Box<dyn Provider> {
-    let provider = config.provider.as_ref().unwrap();
+    let provider = config.provider.clone().unwrap();
+
     match provider.to_uppercase().as_ref() {
-        "FAKE" => Box::new(FakeProvider::new(config)),
-        "OPENAI" => Box::new(OpenAIProvider::builder(config).build()),
+        "FAKER" => Box::new(FakerProvider::new(config)),
+        "OPENAI" | "DEEPINFRA" => Box::new(
+            OpenAIProvider::builder(config)
+                .provider_name(provider)
+                .build(),
+        ),
         _ => panic!("Unsupported provider: {}", provider),
     }
 }
@@ -25,16 +23,13 @@ pub fn construct_provider(config: ModelConfig) -> Box<dyn Provider> {
 #[async_trait]
 pub trait Provider: Send + Sync {
     fn name(&self) -> &'static str;
-    async fn create_response(
-        &self,
-        request: CreateResponseReq,
-    ) -> Result<CreateResponseRes, APIError>;
+    async fn create_response(&self, request: CreateResponse) -> Result<Response, OpenAIError>;
 }
 
-pub fn validate_request(request: &CreateResponseReq) -> Result<(), APIError> {
+pub fn validate_responses_request(request: &CreateResponse) -> Result<(), OpenAIError> {
     if request.model.is_some() {
-        return Err(APIError::InvalidArgument(
-            "Model ID must be specified in the config".to_string(),
+        return Err(OpenAIError::InvalidArgument(
+            "Model must be specified in the client.Config".to_string(),
         ));
     }
     Ok(())
@@ -56,7 +51,7 @@ mod tests {
             TestCase {
                 name: "OpenAI Provider",
                 config: ModelConfig::builder()
-                    .id("test-model".to_string())
+                    .name("test-model".to_string())
                     .provider(Some("openai".to_string()))
                     .base_url(Some("https://api.openai.com/v1".to_string()))
                     .build()
@@ -66,7 +61,7 @@ mod tests {
             TestCase {
                 name: "Unsupported Provider",
                 config: ModelConfig::builder()
-                    .id("test-model".to_string())
+                    .name("test-model".to_string())
                     .provider(Some("unsupported".to_string()))
                     .base_url(Some("https://api.openai.com/v1".to_string()))
                     .build()

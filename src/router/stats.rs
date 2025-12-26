@@ -1,10 +1,10 @@
 use std::collections::HashMap;
 use std::sync::atomic::{AtomicUsize, Ordering};
 
-use crate::config::ModelId;
+use crate::client::config::ModelName;
 
 pub struct RouterStats {
-    requests_per_model: HashMap<ModelId, AtomicUsize>,
+    requests_per_model: HashMap<ModelName, AtomicUsize>,
 }
 
 impl RouterStats {
@@ -14,7 +14,7 @@ impl RouterStats {
         }
     }
 
-    pub fn increment_request(&mut self, model_id: &ModelId) -> usize {
+    pub fn increment_request(&mut self, model_id: &ModelName) -> usize {
         let counter = self
             .requests_per_model
             .entry(model_id.clone())

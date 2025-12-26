@@ -47,10 +47,10 @@ class BasicModelConfig(BaseModel):
     )
 
 
-type ModelID = str
+type ModelName = str
 
 class ModelConfig(BasicModelConfig):
-    id: ModelID = Field(
+    id: ModelName = Field(
         description="ID of the model to be used."
     )
     weight: Optional[int] = Field(

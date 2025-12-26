@@ -11,7 +11,7 @@ Thanks to [async-openai](https://github.com/64bit/async-openai), AMRS builds on 
 - Flexible routing strategies, including:
   - **Random**: Randomly selects a model from the available models.
   - **WRR**: Weighted Round Robin selects models based on predefined weights.
-  - **UCB**: Upper Confidence Bound based model selection (coming soon).
+  - **UCB1**: Upper Confidence Bound based model selection (coming soon).
   - **Adaptive**: Dynamically selects models based on performance metrics (coming soon).
 
 - Broad provider support:
@@ -27,21 +27,22 @@ Here's a simple example with the Weighted Round Robin (WRR) routing mode:
 // Before running the code, make sure to set your OpenAI API key in the environment variable:
 // export OPENAI_API_KEY="your_openai_api_key"
 
-use arms::{Client, Config, ModelConfig, CreateResponseArgs, RoutingMode};
+use arms::client;
+use arms::types::responses;
 
-let config = Config::builder()
+let config = client::Config::builder()
     .provider("openai")
-    .routing_mode(RoutingMode::WRR)
+    .routing_mode(client::RoutingMode::WRR)
     .model(
-        ModelConfig::builder()
-            .id("gpt-3.5-turbo")
+        client::ModelConfig::builder()
+            .name("gpt-3.5-turbo")
             .weight(2)
             .build()
             .unwrap(),
     )
     .model(
-        ModelConfig::builder()
-            .id("gpt-4")
+        client::ModelConfig::builder()
+            .name("gpt-4")
             .weight(1)
             .build()
             .unwrap(),
@@ -49,8 +50,8 @@ let config = Config::builder()
     .build()
     .unwrap();
 
-let mut client = Client::new(config);
-let request = CreateResponseArgs::default()
+let mut client = client::Client::new(config);
+let request = responses::CreateResponseArgs::default()
     .input("give me a poem about nature")
     .build()
     .unwrap();

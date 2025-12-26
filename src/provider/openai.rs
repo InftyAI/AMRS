@@ -2,17 +2,19 @@ use async_openai::{Client, config::OpenAIConfig};
 use async_trait::async_trait;
 use derive_builder::Builder;
 
-use crate::config::{ModelConfig, ModelId};
-use crate::provider::provider::{
-    APIError, CreateResponseReq, CreateResponseRes, Provider, validate_request,
-};
+use crate::client::config::{DEFAULT_PROVIDER, ModelConfig, ModelName};
+use crate::provider::provider;
+use crate::types::error::OpenAIError;
+use crate::types::responses::{CreateResponse, Response};
 
 #[derive(Debug, Clone, Builder)]
 #[builder(pattern = "mutable", build_fn(skip))]
 pub struct OpenAIProvider {
-    model: ModelId,
+    model: ModelName,
     config: OpenAIConfig,
     client: Client<OpenAIConfig>,
+    #[builder(default = "OPENAI_PROVIDER.to_string()", setter(custom))]
+    provider_name: String,
 }
 
 impl OpenAIProvider {
@@ -28,34 +30,48 @@ impl OpenAIProvider {
             .with_api_key(api_key);
 
         OpenAIProviderBuilder {
-            model: Some(config.id.clone()),
+            model: Some(config.name.clone()),
             config: Some(openai_config),
             client: None,
+            provider_name: None,
         }
     }
 }
 
 impl OpenAIProviderBuilder {
+    pub fn provider_name<S: AsRef<str>>(&mut self, name: S) -> &mut Self {
+        self.provider_name = Some(name.as_ref().to_string());
+        self
+    }
+
     pub fn build(&mut self) -> OpenAIProvider {
         OpenAIProvider {
             model: self.model.clone().unwrap(),
             config: self.config.clone().unwrap(),
             client: Client::with_config(self.config.as_ref().unwrap().clone()),
+            provider_name: self
+                .provider_name
+                .clone()
+                .unwrap_or(DEFAULT_PROVIDER.to_string()),
         }
     }
 }
 
 #[async_trait]
-impl Provider for OpenAIProvider {
+impl provider::Provider for OpenAIProvider {
     fn name(&self) -> &'static str {
         "OpenAIProvider"
     }
 
-    async fn create_response(
-        &self,
-        request: CreateResponseReq,
-    ) -> Result<CreateResponseRes, APIError> {
-        validate_request(&request)?;
+    async fn create_response(&self, request: CreateResponse) -> Result<Response, OpenAIError> {
+        if self.provider_name == "DEEPINFRA" {
+            return Err(OpenAIError::InvalidArgument(format!(
+                "Provider '{}' doesn't support Responses endpoint",
+                self.provider_name
+            )));
+        }
+
+        provider::validate_responses_request(&request)?;
         self.client.responses().create(request).await
     }
 }

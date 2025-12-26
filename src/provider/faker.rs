@@ -1,43 +1,35 @@
-use std::str::FromStr;
-
-use async_openai::types::responses::{
-    AssistantRole, OutputItem, OutputMessage, OutputMessageContent, OutputStatus,
-    OutputTextContent, Status,
-};
-use async_openai::{Client, config::OpenAIConfig};
 use async_trait::async_trait;
-use reqwest::header::HeaderName;
 
-use crate::config::{ModelConfig, ModelId};
-use crate::provider::provider::{
-    APIError, CreateResponseReq, CreateResponseRes, Provider, validate_request,
+use crate::client::config::{ModelConfig, ModelName};
+use crate::provider::provider;
+use crate::types::error::OpenAIError;
+use crate::types::responses::{
+    AssistantRole, CreateResponse, OutputItem, OutputMessage, OutputMessageContent, OutputStatus,
+    OutputTextContent, Response, Status,
 };
 
-pub struct FakeProvider {
-    model: ModelId,
+pub struct FakerProvider {
+    model: ModelName,
 }
 
-impl FakeProvider {
+impl FakerProvider {
     pub fn new(config: ModelConfig) -> Self {
         Self {
-            model: config.id.clone(),
+            model: config.name.clone(),
         }
     }
 }
 
 #[async_trait]
-impl Provider for FakeProvider {
+impl provider::Provider for FakerProvider {
     fn name(&self) -> &'static str {
         "FakeProvider"
     }
 
-    async fn create_response(
-        &self,
-        request: CreateResponseReq,
-    ) -> Result<CreateResponseRes, APIError> {
-        validate_request(&request)?;
+    async fn create_response(&self, request: CreateResponse) -> Result<Response, OpenAIError> {
+        provider::validate_responses_request(&request)?;
 
-        Ok(CreateResponseRes {
+        Ok(Response {
             id: "fake-response-id".to_string(),
             object: "text_completion".to_string(),
             model: self.model.clone(),

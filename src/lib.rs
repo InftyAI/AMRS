@@ -8,7 +8,7 @@ mod router {
 }
 
 mod provider {
-    mod fake;
+    mod faker;
     mod openai;
     pub mod provider;
 }

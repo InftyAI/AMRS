@@ -1,16 +1,21 @@
 use async_trait::async_trait;
 
 use crate::client::config::ModelConfig;
-use crate::provider::fake::FakeProvider;
+use crate::provider::faker::FakerProvider;
 use crate::provider::openai::OpenAIProvider;
 use crate::types::error::OpenAIError;
 use crate::types::responses::{CreateResponse, Response};
 
 pub fn construct_provider(config: ModelConfig) -> Box<dyn Provider> {
-    let provider = config.provider.as_ref().unwrap();
+    let provider = config.provider.clone().unwrap();
+
     match provider.to_uppercase().as_ref() {
-        "FAKE" => Box::new(FakeProvider::new(config)),
-        "OPENAI" => Box::new(OpenAIProvider::builder(config).build()),
+        "FAKER" => Box::new(FakerProvider::new(config)),
+        "OPENAI" | "DEEPINFRA" => Box::new(
+            OpenAIProvider::builder(config)
+                .provider_name(provider)
+                .build(),
+        ),
         _ => panic!("Unsupported provider: {}", provider),
     }
 }
@@ -21,10 +26,10 @@ pub trait Provider: Send + Sync {
     async fn create_response(&self, request: CreateResponse) -> Result<Response, OpenAIError>;
 }
 
-pub fn validate_request(request: &CreateResponse) -> Result<(), OpenAIError> {
+pub fn validate_responses_request(request: &CreateResponse) -> Result<(), OpenAIError> {
     if request.model.is_some() {
         return Err(OpenAIError::InvalidArgument(
-            "Model Name must be specified in the config".to_string(),
+            "Model must be specified in the client.Config".to_string(),
         ));
     }
     Ok(())

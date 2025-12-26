@@ -1,18 +1,18 @@
 use async_trait::async_trait;
 
 use crate::client::config::{ModelConfig, ModelName};
-use crate::provider::provider::{Provider, validate_request};
+use crate::provider::provider;
 use crate::types::error::OpenAIError;
 use crate::types::responses::{
     AssistantRole, CreateResponse, OutputItem, OutputMessage, OutputMessageContent, OutputStatus,
     OutputTextContent, Response, Status,
 };
 
-pub struct FakeProvider {
+pub struct FakerProvider {
     model: ModelName,
 }
 
-impl FakeProvider {
+impl FakerProvider {
     pub fn new(config: ModelConfig) -> Self {
         Self {
             model: config.name.clone(),
@@ -21,13 +21,13 @@ impl FakeProvider {
 }
 
 #[async_trait]
-impl Provider for FakeProvider {
+impl provider::Provider for FakerProvider {
     fn name(&self) -> &'static str {
         "FakeProvider"
     }
 
     async fn create_response(&self, request: CreateResponse) -> Result<Response, OpenAIError> {
-        validate_request(&request)?;
+        provider::validate_responses_request(&request)?;
 
         Ok(Response {
             id: "fake-response-id".to_string(),

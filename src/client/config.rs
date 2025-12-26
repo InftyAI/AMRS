@@ -5,7 +5,7 @@ use derive_builder::Builder;
 use lazy_static::lazy_static;
 
 // ------------------ Provider ------------------
-const OPENAI_PROVIDER: &str = "OPENAI";
+pub const DEFAULT_PROVIDER: &str = "OPENAI";
 
 lazy_static! {
     pub static ref PROVIDER_BASE_URLS: HashMap<&'static str, &'static str> = {
@@ -14,7 +14,7 @@ lazy_static! {
         m.insert("DEEPINFRA", "https://api.deepinfra.com/v1/openai");
         m.insert("OPENROUTER", "https://openrouter.ai/api/v1");
 
-        m.insert("FAKE", "http://localhost:8080"); // test only
+        m.insert("FAKER", "http://localhost:8080"); // test only
         // TODO: support more providers here...
         m
     };
@@ -82,9 +82,9 @@ impl ModelConfig {
 #[builder(build_fn(validate = "Self::validate"), pattern = "mutable")]
 pub struct Config {
     // global configs for models, will be overridden by model-specific configs
-    #[builder(default = "https://api.openai.com/v1".to_string())]
-    pub(crate) base_url: String,
-    #[builder(default = "OPENAI_PROVIDER.to_string()", setter(custom))]
+    #[builder(default=None, setter(custom))]
+    pub(crate) base_url: Option<String>,
+    #[builder(default = "DEFAULT_PROVIDER.to_string()", setter(custom))]
     pub(crate) provider: String,
     #[builder(default = "0.8")]
     pub(crate) temperature: f32,
@@ -104,22 +104,34 @@ impl Config {
 
     // populate will fill in the missing model-specific configs with global configs.
     pub fn populate(&mut self) -> &mut Self {
+        let global_base_url = match self.base_url.is_some() {
+            true => self.base_url.clone(),
+            false => Some(
+                PROVIDER_BASE_URLS
+                    .get(self.provider.as_str())
+                    .unwrap()
+                    .to_string(),
+            ),
+        };
+
         for model in &mut self.models {
-            let model_url_exist = model.base_url.is_some();
+            if model.base_url.is_none() {
+                if model.provider.is_some() {
+                    model.base_url = Some(
+                        PROVIDER_BASE_URLS
+                            .get(model.provider.as_ref().unwrap().as_str())
+                            .unwrap()
+                            .to_string(),
+                    );
+                } else {
+                    model.base_url = global_base_url.clone();
+                }
+            }
 
             if model.provider.is_none() {
                 model.provider = Some(self.provider.clone());
             }
 
-            if !model_url_exist
-                && PROVIDER_BASE_URLS.contains_key(model.provider.as_ref().unwrap().as_str())
-            {
-                model.base_url =
-                    Some(PROVIDER_BASE_URLS[model.provider.as_ref().unwrap().as_str()].to_string());
-            }
-            if !model_url_exist {
-                model.base_url = Some(self.base_url.clone());
-            }
             if model.temperature.is_none() {
                 model.temperature = Some(self.temperature);
             }
@@ -132,6 +144,10 @@ impl Config {
 }
 
 impl ConfigBuilder {
+    pub fn base_url<S: AsRef<str>>(&mut self, url: S) -> &mut Self {
+        self.base_url = Some(Some(url.as_ref().to_string()));
+        self
+    }
     pub fn model(&mut self, model: ModelConfig) -> &mut Self {
         let mut models = self.models.clone().unwrap_or_default();
         models.push(model);
@@ -180,7 +196,7 @@ impl ConfigBuilder {
 
             // check the existence of API key in environment variables
             if let Some(provider) = &model.provider {
-                let env_var = format!("{}_API_KEY", provider.to_uppercase());
+                let env_var = format!("{}_API_KEY", provider);
                 if env::var(&env_var).is_err() {
                     return Err(format!(
                         "API key for provider '{}' not found in environment variable '{}'",
@@ -194,7 +210,7 @@ impl ConfigBuilder {
                     "{}_API_KEY",
                     self.provider
                         .as_ref()
-                        .unwrap_or(&OPENAI_PROVIDER.to_string())
+                        .unwrap_or(&DEFAULT_PROVIDER.to_string())
                         .to_uppercase()
                 );
                 if env::var(&env_var).is_err() {
@@ -202,8 +218,7 @@ impl ConfigBuilder {
                         "API key for provider '{}' not found in environment variable '{}'",
                         self.provider
                             .as_ref()
-                            .unwrap_or(&OPENAI_PROVIDER.to_string())
-                            .to_uppercase(),
+                            .unwrap_or(&DEFAULT_PROVIDER.to_string()),
                         env_var
                     ));
                 }
@@ -234,10 +249,8 @@ mod tests {
             )
             .build();
         assert!(valid_simplest_models_cfg.is_ok());
-        assert!(valid_simplest_models_cfg.as_ref().unwrap().provider == OPENAI_PROVIDER);
-        assert!(
-            valid_simplest_models_cfg.as_ref().unwrap().base_url == "https://api.openai.com/v1"
-        );
+        assert!(valid_simplest_models_cfg.as_ref().unwrap().provider == DEFAULT_PROVIDER);
+        assert!(valid_simplest_models_cfg.as_ref().unwrap().base_url == None);
         assert!(valid_simplest_models_cfg.as_ref().unwrap().temperature == 0.8);
         assert!(
             valid_simplest_models_cfg
@@ -285,7 +298,7 @@ mod tests {
         // case 4:
         // AMRS_API_KEY is set in .env.test already.
         let valid_cfg_with_customized_provider = Config::builder()
-            .base_url("http://example.ai".to_string())
+            .base_url("http://example.ai")
             .max_output_tokens(2048)
             .model(
                 ModelConfig::builder()

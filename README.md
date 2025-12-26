@@ -35,14 +35,14 @@ let config = client::Config::builder()
     .routing_mode(client::RoutingMode::WRR)
     .model(
         client::ModelConfig::builder()
-            .id("gpt-3.5-turbo")
+            .name("gpt-3.5-turbo")
             .weight(2)
             .build()
             .unwrap(),
     )
     .model(
         client::ModelConfig::builder()
-            .id("gpt-4")
+            .name("gpt-4")
             .weight(1)
             .build()
             .unwrap(),

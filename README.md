@@ -27,8 +27,9 @@ Here's a simple example with the Weighted Round Robin (WRR) routing mode:
 // Before running the code, make sure to set your OpenAI API key in the environment variable:
 // export OPENAI_API_KEY="your_openai_api_key"
 
+use tokio::runtime::Runtime;
 use arms::client;
-use arms::types::responses;
+use arms::types::chat;
 
 let config = client::Config::builder()
     .provider("openai")
@@ -51,12 +52,15 @@ let config = client::Config::builder()
     .unwrap();
 
 let mut client = client::Client::new(config);
-let request = responses::CreateResponseArgs::default()
-    .input("give me a poem about nature")
+let request = chat::CreateChatCompletionRequestArgs::default()
+    .messages([
+        chat::ChatCompletionRequestSystemMessage::from("You are a helpful assistant.").into(),
+        chat::ChatCompletionRequestUserMessage::from("How is the weather today?").into(),
+    ])
     .build()
     .unwrap();
 
-let response = client.create_response(request).await.unwrap();
+let result = Runtime::new().unwrap().block_on(client.create_completion(request));
 ```
 
 ## Contributing

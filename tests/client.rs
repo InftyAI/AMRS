@@ -1,6 +1,7 @@
 use dotenvy::from_filename;
 
 use arms::client;
+use arms::types::chat;
 use arms::types::responses;
 
 #[cfg(test)]
@@ -79,5 +80,30 @@ mod tests {
             .build()
             .unwrap();
         let _ = client.create_response(request).await.unwrap();
+    }
+
+    #[tokio::test]
+    async fn test_completion() {
+        from_filename(".env.integration-test").ok();
+
+        let config = client::Config::builder()
+            .provider("faker")
+            .model(
+                client::ModelConfig::builder()
+                    .name("fake-completion-model")
+                    .build()
+                    .unwrap(),
+            )
+            .build()
+            .unwrap();
+
+        let mut client = client::Client::new(config);
+        let request = chat::CreateChatCompletionRequestArgs::default()
+            .build()
+            .unwrap();
+
+        let response = client.create_completion(request).await.unwrap();
+        assert!(response.id.starts_with("fake-completion-id"));
+        assert!(response.model == "fake-completion-model");
     }
 }

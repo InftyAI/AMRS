@@ -2,7 +2,6 @@ use rand::Rng;
 
 use crate::client::config::ModelName;
 use crate::router::router::{ModelInfo, Router};
-use crate::types::responses::CreateResponse;
 
 pub struct RandomRouter {
     pub model_infos: Vec<ModelInfo>,
@@ -19,7 +18,7 @@ impl Router for RandomRouter {
         "RandomRouter"
     }
 
-    fn sample(&mut self, _input: &CreateResponse) -> ModelName {
+    fn sample(&mut self) -> ModelName {
         let mut rng = rand::rng();
         let idx = rng.random_range(0..self.model_infos.len());
         self.model_infos[idx].name.clone()
@@ -50,7 +49,7 @@ mod tests {
         let mut counts = std::collections::HashMap::new();
 
         for _ in 0..1000 {
-            let candidate = router.sample(&CreateResponse::default());
+            let candidate = router.sample();
             *counts.entry(candidate.clone()).or_insert(0) += 1;
         }
         assert!(counts.len() == model_infos.len());

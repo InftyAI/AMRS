@@ -38,10 +38,6 @@ pub struct ModelConfig {
     pub(crate) base_url: Option<String>,
     #[builder(default = "None", setter(custom))]
     pub(crate) provider: Option<String>,
-    #[builder(default = "None")]
-    pub(crate) temperature: Option<f32>,
-    #[builder(default = "None")]
-    pub(crate) max_output_tokens: Option<usize>,
 
     #[builder(setter(custom))]
     pub(crate) name: ModelName,
@@ -86,10 +82,6 @@ pub struct Config {
     pub(crate) base_url: Option<String>,
     #[builder(default = "DEFAULT_PROVIDER.to_string()", setter(custom))]
     pub(crate) provider: String,
-    #[builder(default = "0.8")]
-    pub(crate) temperature: f32,
-    #[builder(default = "1024")]
-    pub(crate) max_output_tokens: usize,
 
     #[builder(default = "RoutingMode::Random")]
     pub(crate) routing_mode: RoutingMode,
@@ -131,13 +123,6 @@ impl Config {
             if model.provider.is_none() {
                 model.provider = Some(self.provider.clone());
             }
-
-            if model.temperature.is_none() {
-                model.temperature = Some(self.temperature);
-            }
-            if model.max_output_tokens.is_none() {
-                model.max_output_tokens = Some(self.max_output_tokens);
-            }
         }
         self
     }
@@ -174,24 +159,6 @@ impl ConfigBuilder {
                     "Model '{}' weight must be non-negative in Weighted routing mode.",
                     model.name
                 ));
-            }
-
-            if let Some(max_output_tokens) = model.max_output_tokens {
-                if max_output_tokens <= 0 {
-                    return Err(format!(
-                        "Model '{}' max_output_tokens must be positive.",
-                        model.name
-                    ));
-                }
-            }
-
-            if let Some(temperature) = model.temperature {
-                if temperature < 0.0 || temperature > 1.0 {
-                    return Err(format!(
-                        "Model '{}' temperature must be between 0.0 and 1.0.",
-                        model.name
-                    ));
-                }
             }
 
             // check the existence of API key in environment variables
@@ -251,20 +218,10 @@ mod tests {
         assert!(valid_simplest_models_cfg.is_ok());
         assert!(valid_simplest_models_cfg.as_ref().unwrap().provider == DEFAULT_PROVIDER);
         assert!(valid_simplest_models_cfg.as_ref().unwrap().base_url == None);
-        assert!(valid_simplest_models_cfg.as_ref().unwrap().temperature == 0.8);
-        assert!(
-            valid_simplest_models_cfg
-                .as_ref()
-                .unwrap()
-                .max_output_tokens
-                == 1024
-        );
         assert!(valid_simplest_models_cfg.as_ref().unwrap().routing_mode == RoutingMode::Random);
         assert!(valid_simplest_models_cfg.as_ref().unwrap().models.len() == 1);
         assert!(valid_simplest_models_cfg.as_ref().unwrap().models[0].base_url == None);
         assert!(valid_simplest_models_cfg.as_ref().unwrap().models[0].provider == None);
-        assert!(valid_simplest_models_cfg.as_ref().unwrap().models[0].temperature == None);
-        assert!(valid_simplest_models_cfg.as_ref().unwrap().models[0].max_output_tokens == None);
         assert!(valid_simplest_models_cfg.as_ref().unwrap().models[0].weight == -1);
 
         // case 2:
@@ -299,7 +256,6 @@ mod tests {
         // AMRS_API_KEY is set in .env.test already.
         let valid_cfg_with_customized_provider = Config::builder()
             .base_url("http://example.ai")
-            .max_output_tokens(2048)
             .model(
                 ModelConfig::builder()
                     .name("custom-model")
@@ -325,8 +281,6 @@ mod tests {
         from_filename(".env.test").ok();
 
         let mut valid_cfg = Config::builder()
-            .temperature(0.5)
-            .max_output_tokens(1500)
             .model(
                 ModelConfig::builder()
                     .name("model-1".to_string())
@@ -338,8 +292,6 @@ mod tests {
 
         assert!(valid_cfg.is_ok());
         assert!(valid_cfg.as_ref().unwrap().models.len() == 1);
-        assert!(valid_cfg.as_ref().unwrap().models[0].temperature == Some(0.5));
-        assert!(valid_cfg.as_ref().unwrap().models[0].max_output_tokens == Some(1500));
         assert!(valid_cfg.as_ref().unwrap().models[0].provider == Some("OPENAI".to_string()));
         assert!(
             valid_cfg.as_ref().unwrap().models[0].base_url

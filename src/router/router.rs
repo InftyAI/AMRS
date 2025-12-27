@@ -1,7 +1,6 @@
 use crate::client::config::{ModelConfig, ModelName, RoutingMode};
 use crate::router::random::RandomRouter;
 use crate::router::wrr::WeightedRoundRobinRouter;
-use crate::types::responses::CreateResponse;
 
 #[derive(Debug, Clone)]
 pub struct ModelInfo {
@@ -25,7 +24,7 @@ pub fn construct_router(mode: RoutingMode, models: Vec<ModelConfig>) -> Box<dyn 
 
 pub trait Router {
     fn name(&self) -> &'static str;
-    fn sample(&mut self, input: &CreateResponse) -> ModelName;
+    fn sample(&mut self) -> ModelName;
 }
 
 #[cfg(test)]

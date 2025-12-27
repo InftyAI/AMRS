@@ -1,7 +1,8 @@
 use async_trait::async_trait;
 
 use crate::client::config::{ModelConfig, ModelName};
-use crate::provider::provider;
+use crate::provider::{common, provider};
+use crate::types::chat;
 use crate::types::error::OpenAIError;
 use crate::types::responses::{
     AssistantRole, CreateResponse, OutputItem, OutputMessage, OutputMessageContent, OutputStatus,
@@ -26,8 +27,8 @@ impl provider::Provider for FakerProvider {
         "FakeProvider"
     }
 
-    async fn create_response(&self, request: CreateResponse) -> Result<Response, OpenAIError> {
-        provider::validate_responses_request(&request)?;
+    async fn create_response(&self, _request: CreateResponse) -> Result<Response, OpenAIError> {
+        common::validate_response_request(&_request)?;
 
         Ok(Response {
             id: "fake-response-id".to_string(),
@@ -69,6 +70,36 @@ impl provider::Provider for FakerProvider {
             tool_choice: None,
             top_logprobs: None,
             truncation: None,
+        })
+    }
+
+    async fn create_completion(
+        &self,
+        request: chat::CreateChatCompletionRequest,
+    ) -> Result<chat::CreateChatCompletionResponse, OpenAIError> {
+        common::validate_completion_request(&request)?;
+        Ok(chat::CreateChatCompletionResponse {
+            id: "fake-completion-id".to_string(),
+            object: "text_completion".to_string(),
+            created: 1_600_000_000,
+            model: self.model.clone(),
+            usage: None,
+            service_tier: None,
+            choices: vec![chat::ChatChoice {
+                index: 0,
+                message: chat::ChatCompletionResponseMessage {
+                    role: chat::Role::Assistant,
+                    content: Some("This is a fake chat completion.".to_string()),
+                    refusal: None,
+                    tool_calls: None,
+                    annotations: None,
+                    function_call: None,
+                    audio: None,
+                },
+                finish_reason: None,
+                logprobs: None,
+            }],
+            system_fingerprint: None,
         })
     }
 }

@@ -4,7 +4,10 @@ use crate::client::config::ModelConfig;
 use crate::provider::faker::FakerProvider;
 use crate::provider::openai::OpenAIProvider;
 use crate::types::error::OpenAIError;
-use crate::types::responses::{CreateResponse, Response};
+use crate::types::{chat, responses};
+
+// Not all providers support response endpoint.
+pub const RESPONSE_ENDPOINT_PROVIDERS: &[&str] = &["FAKER", "OPENAI"];
 
 pub fn construct_provider(config: ModelConfig) -> Box<dyn Provider> {
     let provider = config.provider.clone().unwrap();
@@ -22,17 +25,16 @@ pub fn construct_provider(config: ModelConfig) -> Box<dyn Provider> {
 
 #[async_trait]
 pub trait Provider: Send + Sync {
+    // Used in tests only now.
     fn name(&self) -> &'static str;
-    async fn create_response(&self, request: CreateResponse) -> Result<Response, OpenAIError>;
-}
-
-pub fn validate_responses_request(request: &CreateResponse) -> Result<(), OpenAIError> {
-    if request.model.is_some() {
-        return Err(OpenAIError::InvalidArgument(
-            "Model must be specified in the client.Config".to_string(),
-        ));
-    }
-    Ok(())
+    async fn create_response(
+        &self,
+        request: responses::CreateResponse,
+    ) -> Result<responses::Response, OpenAIError>;
+    async fn create_completion(
+        &self,
+        request: chat::CreateChatCompletionRequest,
+    ) -> Result<chat::CreateChatCompletionResponse, OpenAIError>;
 }
 
 #[cfg(test)]

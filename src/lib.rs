@@ -8,11 +8,13 @@ mod router {
 }
 
 mod provider {
+    mod common;
     mod faker;
     mod openai;
     pub mod provider;
 }
 pub mod types {
+    pub mod chat;
     pub mod error;
     pub mod responses;
 }

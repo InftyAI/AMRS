@@ -3,9 +3,9 @@ use async_trait::async_trait;
 use derive_builder::Builder;
 
 use crate::client::config::{DEFAULT_PROVIDER, ModelConfig, ModelName};
-use crate::provider::provider;
+use crate::provider::{common, provider};
 use crate::types::error::OpenAIError;
-use crate::types::responses::{CreateResponse, Response};
+use crate::types::{chat, responses};
 
 #[derive(Debug, Clone, Builder)]
 #[builder(pattern = "mutable", build_fn(skip))]
@@ -63,15 +63,34 @@ impl provider::Provider for OpenAIProvider {
         "OpenAIProvider"
     }
 
-    async fn create_response(&self, request: CreateResponse) -> Result<Response, OpenAIError> {
-        if self.provider_name == "DEEPINFRA" {
+    async fn create_completion(
+        &self,
+        request: chat::CreateChatCompletionRequest,
+    ) -> Result<chat::CreateChatCompletionResponse, OpenAIError> {
+        common::validate_completion_request(&request)?;
+
+        // Set the model after validation since model is bind to the provider.
+        let mut req = request.clone();
+        req.model = self.model.clone();
+        self.client.chat().create(req).await
+    }
+
+    async fn create_response(
+        &self,
+        request: responses::CreateResponse,
+    ) -> Result<responses::Response, OpenAIError> {
+        if !provider::RESPONSE_ENDPOINT_PROVIDERS.contains(&self.provider_name.as_str()) {
             return Err(OpenAIError::InvalidArgument(format!(
                 "Provider '{}' doesn't support Responses endpoint",
                 self.provider_name
             )));
         }
 
-        provider::validate_responses_request(&request)?;
-        self.client.responses().create(request).await
+        common::validate_response_request(&request)?;
+
+        // Set the model after validation since model is bind to the provider.
+        let mut req = request.clone();
+        req.model = Some(self.model.clone());
+        self.client.responses().create(req).await
     }
 }

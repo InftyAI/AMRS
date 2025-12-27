@@ -5,7 +5,7 @@ use derive_builder::Builder;
 use crate::client::config::{DEFAULT_PROVIDER, ModelConfig, ModelName};
 use crate::provider::{common, provider};
 use crate::types::error::OpenAIError;
-use crate::types::{completions, responses};
+use crate::types::{chat, responses};
 
 #[derive(Debug, Clone, Builder)]
 #[builder(pattern = "mutable", build_fn(skip))]
@@ -65,14 +65,14 @@ impl provider::Provider for OpenAIProvider {
 
     async fn create_completion(
         &self,
-        request: completions::CreateCompletionRequest,
-    ) -> Result<completions::CreateCompletionResponse, OpenAIError> {
+        request: chat::CreateChatCompletionRequest,
+    ) -> Result<chat::CreateChatCompletionResponse, OpenAIError> {
         common::validate_completion_request(&request)?;
 
         // Set the model after validation since model is bind to the provider.
         let mut req = request.clone();
         req.model = self.model.clone();
-        self.client.completions().create(req).await
+        self.client.chat().create(req).await
     }
 
     async fn create_response(

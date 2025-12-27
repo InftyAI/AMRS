@@ -4,7 +4,7 @@ use crate::client::config::{Config, ModelName};
 use crate::provider::provider;
 use crate::router::router;
 use crate::types::error::OpenAIError;
-use crate::types::{completions, responses};
+use crate::types::{chat, responses};
 
 pub struct Client {
     providers: HashMap<ModelName, Box<dyn provider::Provider>>,
@@ -37,10 +37,11 @@ impl Client {
         provider.create_response(request).await
     }
 
+    // This is chat completion endpoint.
     pub async fn create_completion(
         &mut self,
-        request: completions::CreateCompletionRequest,
-    ) -> Result<completions::CreateCompletionResponse, OpenAIError> {
+        request: chat::CreateChatCompletionRequest,
+    ) -> Result<chat::CreateChatCompletionResponse, OpenAIError> {
         let candidate = self.router.sample();
         let provider = self.providers.get(&candidate).unwrap();
         provider.create_completion(request).await

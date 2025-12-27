@@ -1,6 +1,5 @@
 use crate::client::config::ModelName;
 use crate::router::router::{ModelInfo, Router};
-use crate::types::responses::CreateResponse;
 
 pub struct WeightedRoundRobinRouter {
     total_weight: i32,

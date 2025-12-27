@@ -4,7 +4,7 @@ use crate::client::config::ModelConfig;
 use crate::provider::faker::FakerProvider;
 use crate::provider::openai::OpenAIProvider;
 use crate::types::error::OpenAIError;
-use crate::types::{completions, responses};
+use crate::types::{chat, responses};
 
 // Not all providers support response endpoint.
 pub const RESPONSE_ENDPOINT_PROVIDERS: &[&str] = &["FAKER", "OPENAI"];
@@ -33,8 +33,8 @@ pub trait Provider: Send + Sync {
     ) -> Result<responses::Response, OpenAIError>;
     async fn create_completion(
         &self,
-        request: completions::CreateCompletionRequest,
-    ) -> Result<completions::CreateCompletionResponse, OpenAIError>;
+        request: chat::CreateChatCompletionRequest,
+    ) -> Result<chat::CreateChatCompletionResponse, OpenAIError>;
 }
 
 #[cfg(test)]

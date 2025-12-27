@@ -1,7 +1,7 @@
 use tokio::runtime::Runtime;
 
 use arms::client;
-use arms::types::{completions, responses};
+use arms::types::chat;
 
 fn main() {
     // case 1: completion with DeepInfra provider.
@@ -27,8 +27,17 @@ fn main() {
 
     let mut client = client::Client::new(config);
 
-    let request = completions::CreateCompletionRequestArgs::default()
-        .prompt("How to achieve AGI?")
+    let request = chat::CreateChatCompletionRequestArgs::default()
+        .messages([
+            chat::ChatCompletionRequestSystemMessage::from("You are a helpful assistant.").into(),
+            chat::ChatCompletionRequestUserMessage::from("Who won the world series in 2020?")
+                .into(),
+            // chat::ChatCompletionRequestAssistantMessage::from(
+            //     "The Los Angeles Dodgers won the World Series in 2020.",
+            // )
+            // .into(),
+            // chat::ChatCompletionRequestUserMessage::from("Where was it played?").into(),
+        ])
         .build()
         .unwrap();
 
@@ -38,7 +47,7 @@ fn main() {
 
     match result {
         Ok(response) => {
-            println!("Response ID: {}", response.id);
+            println!("Response: {:?}", response);
         }
         Err(e) => {
             eprintln!("Error: {}", e);

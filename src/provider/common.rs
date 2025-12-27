@@ -1,8 +1,8 @@
 use crate::types::error::OpenAIError;
-use crate::types::{completions, responses};
+use crate::types::{chat, responses};
 
 pub fn validate_completion_request(
-    request: &completions::CreateCompletionRequest,
+    request: &chat::CreateChatCompletionRequest,
 ) -> Result<(), OpenAIError> {
     if request.model != "" {
         return Err(OpenAIError::InvalidArgument(

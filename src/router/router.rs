@@ -1,7 +1,6 @@
 use crate::client::config::{ModelConfig, ModelName, RoutingMode};
 use crate::router::random::RandomRouter;
 use crate::router::wrr::WeightedRoundRobinRouter;
-use crate::types::responses::CreateResponse;
 
 #[derive(Debug, Clone)]
 pub struct ModelInfo {

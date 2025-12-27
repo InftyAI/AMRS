@@ -1,7 +1,7 @@
 use dotenvy::from_filename;
 
 use arms::client;
-use arms::types::completions;
+use arms::types::chat;
 use arms::types::responses;
 
 #[cfg(test)]
@@ -98,7 +98,7 @@ mod tests {
             .unwrap();
 
         let mut client = client::Client::new(config);
-        let request = completions::CreateCompletionRequestArgs::default()
+        let request = chat::CreateChatCompletionRequestArgs::default()
             .build()
             .unwrap();
 

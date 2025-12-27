@@ -14,7 +14,7 @@ mod provider {
     pub mod provider;
 }
 pub mod types {
-    pub mod completions;
+    pub mod chat;
     pub mod error;
     pub mod responses;
 }

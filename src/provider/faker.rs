@@ -1,9 +1,8 @@
-use async_openai::types::chat::Choice;
 use async_trait::async_trait;
 
 use crate::client::config::{ModelConfig, ModelName};
 use crate::provider::{common, provider};
-use crate::types::completions::{CreateCompletionRequest, CreateCompletionResponse};
+use crate::types::chat;
 use crate::types::error::OpenAIError;
 use crate::types::responses::{
     AssistantRole, CreateResponse, OutputItem, OutputMessage, OutputMessageContent, OutputStatus,
@@ -76,22 +75,30 @@ impl provider::Provider for FakerProvider {
 
     async fn create_completion(
         &self,
-        _request: CreateCompletionRequest,
-    ) -> Result<CreateCompletionResponse, OpenAIError> {
-        common::validate_completion_request(&_request)?;
-
-        Ok(CreateCompletionResponse {
+        request: chat::CreateChatCompletionRequest,
+    ) -> Result<chat::CreateChatCompletionResponse, OpenAIError> {
+        common::validate_completion_request(&request)?;
+        Ok(chat::CreateChatCompletionResponse {
             id: "fake-completion-id".to_string(),
             object: "text_completion".to_string(),
             created: 1_600_000_000,
             model: self.model.clone(),
-            choices: vec![Choice {
-                index: 0,
-                text: "This is a fake completion.".to_string(),
-                logprobs: None,
-                finish_reason: None,
-            }],
             usage: None,
+            service_tier: None,
+            choices: vec![chat::ChatChoice {
+                index: 0,
+                message: chat::ChatCompletionResponseMessage {
+                    role: chat::Role::Assistant,
+                    content: Some("This is a fake chat completion.".to_string()),
+                    refusal: None,
+                    tool_calls: None,
+                    annotations: None,
+                    function_call: None,
+                    audio: None,
+                },
+                finish_reason: None,
+                logprobs: None,
+            }],
             system_fingerprint: None,
         })
     }

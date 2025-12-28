@@ -47,7 +47,9 @@ fn main() {
 
     match result {
         Ok(response) => {
-            println!("Response: {:?}", response);
+            for choice in response.choices {
+                println!("Response: {:?}", choice.message.content);
+            }
         }
         Err(e) => {
             eprintln!("Error: {}", e);

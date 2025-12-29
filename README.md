@@ -40,7 +40,7 @@ Here we use OpenAI as an example.
 
 
 ```rust
-# Make sure OPENAI_API_KEY is set in your environment variables before running this code.
+// Make sure OPENAI_API_KEY is set in your environment variables before running this code.
 
 use arms::client;
 use arms::types::chat;

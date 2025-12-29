@@ -7,7 +7,8 @@ description = "🧬 The adaptive model routing system for exploration and exploi
 license = "MIT"
 repository = "https://github.com/InftyAI/AMRS"
 readme = "README.md"
-keywords = ["llmops", "ai-gateway", "ai-proxy"]
+keywords = ["llmops", "ai-gateway", "ai-proxy", "sdk", "llm"]
+categories = ["router"]
 
 [dependencies]
 async-openai = { version = "0.31.1", features = ["_api", "response-types", "responses", "chat-completion"] }

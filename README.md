@@ -23,7 +23,17 @@ AMRS builds on top of [async-openai](https://github.com/64bit/async-openai) to p
   - OpenAI compatible providers (OpenAI, DeepInfra, etc.)
   - More on the way
 
-## How to use
+## How to Install
+
+Run the following Cargo command in your project directory:
+
+`cargo add arms`
+
+Or add the following line to your Cargo.toml:
+
+`arms = "0.0.1"`
+
+## How to Use
 
 Here's a simple example with the Weighted Round Robin (WRR) routing mode. Before running the code, make sure to set your provider API key in the environment variable by running `export <PROVIDER>_API_KEY="your_openai_api_key"`.
 Here we use OpenAI as an example.
@@ -32,51 +42,57 @@ Here we use OpenAI as an example.
 ```rust
 # Make sure OPENAI_API_KEY is set in your environment variables before running this code.
 
-use tokio::runtime::Runtime;
 use arms::client;
 use arms::types::chat;
+use tokio::runtime::Runtime;
 
-let config = client::Config::builder()
-    .provider("openai")
-    .routing_mode(client::RoutingMode::WRR)
-    .model(
-        client::ModelConfig::builder()
-            .name("gpt-3.5-turbo")
-            .weight(2)
-            .build()
-            .unwrap(),
-    )
-    .model(
-        client::ModelConfig::builder()
-            .name("gpt-4")
-            .weight(1)
-            .build()
-            .unwrap(),
-    )
-    .build()
-    .unwrap();
+fn main() {
+    let config = client::Config::builder()
+        .provider("deepinfra")
+        .routing_mode(client::RoutingMode::WRR)
+        .model(
+            client::ModelConfig::builder()
+                .name("deepseek-ai/DeepSeek-V3.2")
+                .weight(2)
+                .build()
+                .unwrap(),
+        )
+        .model(
+            client::ModelConfig::builder()
+                .name("nvidia/Nemotron-3-Nano-30B-A3B")
+                .weight(1)
+                .build()
+                .unwrap(),
+        )
+        .build()
+        .unwrap();
 
-let mut client = client::Client::new(config);
-let request = chat::CreateChatCompletionRequestArgs::default()
-    .messages([
-        chat::ChatCompletionRequestSystemMessage::from("You are a helpful assistant.").into(),
-        chat::ChatCompletionRequestUserMessage::from("Who won the FIFA World Cup in 2025?").into(),
-    ])
-    .build()
-    .unwrap();
+    let mut client = client::Client::new(config);
+    let request = chat::CreateChatCompletionRequestArgs::default()
+        .messages([
+            chat::ChatCompletionRequestSystemMessage::from("You are a helpful assistant.").into(),
+            chat::ChatCompletionRequestUserMessage::from("How long it takes to learn Rust?").into(),
+        ])
+        .build()
+        .unwrap();
 
-let result = Runtime::new().unwrap().block_on(client.create_completion(request));
-match result {
-    Ok(response) => {
-        for choice in response.choices {
-            println!("Response: {:?}", choice.message.content);
+    let result = Runtime::new()
+        .unwrap()
+        .block_on(client.create_completion(request));
+    match result {
+        Ok(response) => {
+            for choice in response.choices {
+                println!("Response: {:?}", choice.message.content);
+            }
         }
-    }
-    Err(e) => {
-        eprintln!("Error: {}", e);
+        Err(e) => {
+            eprintln!("Error: {}", e);
+        }
     }
 }
 ```
+
+See more examples [here](/examples) folder.
 
 ## Contributing
 

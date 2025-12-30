@@ -1,7 +1,7 @@
-from amrs.config import ModelConfig, Config, RoutingMode
+from amrs.config import ModelConfig, Config, RouterMode
 
 __all__ = [
     "ModelConfig",
     "Config",
-    "RoutingMode",
+    "RouterMode",
 ]

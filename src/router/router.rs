@@ -1,4 +1,4 @@
-use crate::client::config::{ModelConfig, ModelName, RoutingMode};
+use crate::client::config::{ModelConfig, ModelName, RouterMode};
 use crate::router::random::RandomRouter;
 use crate::router::wrr::WeightedRoundRobinRouter;
 
@@ -8,7 +8,7 @@ pub struct ModelInfo {
     pub weight: i32,
 }
 
-pub fn construct_router(mode: RoutingMode, models: Vec<ModelConfig>) -> Box<dyn Router> {
+pub fn construct_router(mode: RouterMode, models: Vec<ModelConfig>) -> Box<dyn Router> {
     let model_infos: Vec<ModelInfo> = models
         .iter()
         .map(|m| ModelInfo {
@@ -17,8 +17,8 @@ pub fn construct_router(mode: RoutingMode, models: Vec<ModelConfig>) -> Box<dyn 
         })
         .collect();
     match mode {
-        RoutingMode::Random => Box::new(RandomRouter::new(model_infos)),
-        RoutingMode::WRR => Box::new(WeightedRoundRobinRouter::new(model_infos)),
+        RouterMode::Random => Box::new(RandomRouter::new(model_infos)),
+        RouterMode::WRR => Box::new(WeightedRoundRobinRouter::new(model_infos)),
     }
 }
 
@@ -47,10 +47,10 @@ mod tests {
                 .unwrap(),
         ];
 
-        let random_router = construct_router(RoutingMode::Random, model_configs.clone());
+        let random_router = construct_router(RouterMode::Random, model_configs.clone());
         assert_eq!(random_router.name(), "RandomRouter");
 
-        let weighted_router = construct_router(RoutingMode::WRR, model_configs.clone());
+        let weighted_router = construct_router(RouterMode::WRR, model_configs.clone());
         assert_eq!(weighted_router.name(), "WeightedRoundRobinRouter");
     }
 }

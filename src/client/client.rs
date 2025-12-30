@@ -51,7 +51,7 @@ impl Client {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::client::config::{Config, ModelConfig, RoutingMode};
+    use crate::client::config::{Config, ModelConfig, RouterMode};
     use dotenvy::from_filename;
 
     #[test]
@@ -81,7 +81,7 @@ mod tests {
             TestCase {
                 name: "weighted round-robin router",
                 config: Config::builder()
-                    .routing_mode(RoutingMode::WRR)
+                    .routing_mode(RouterMode::WRR)
                     .models(vec![
                         crate::client::config::ModelConfig::builder()
                             .name("model_a".to_string())

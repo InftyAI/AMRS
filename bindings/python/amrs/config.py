@@ -72,15 +72,15 @@ class Message(BaseModel):
     content: str = Field(description="Content of the message.")
 
 
-class RoutingMode(str, Enum):
+class RouterMode(str, Enum):
     RANDOM = "random"
     WEIGHTED = "weighted"
 
 
 class Config(BasicModelConfig):
     models: List[ModelConfig] = Field(description="List of model configurations")
-    routing_mode: RoutingMode = Field(
-        default=RoutingMode.RANDOM,
+    routing_mode: RouterMode = Field(
+        default=RouterMode.RANDOM,
         description="Routing mode for the model, default is random.",
     )
     callback_funcs: Optional[List[Callable]] = Field(

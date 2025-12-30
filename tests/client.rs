@@ -57,7 +57,7 @@ mod tests {
         // case 3: multiple models with router.
         let config = client::Config::builder()
             .provider("faker")
-            .routing_mode(client::RoutingMode::WRR)
+            .routing_mode(client::RouterMode::WRR)
             .model(
                 client::ModelConfig::builder()
                     .name("gpt-3.5-turbo")

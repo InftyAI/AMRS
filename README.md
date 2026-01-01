@@ -8,7 +8,7 @@ AMRS builds on top of [async-openai](https://github.com/64bit/async-openai) to p
 
 ## Features
 
-- **Endpoints Support** (only basic ones because of limited resources):
+- **Endpoints Support**:
   - Chat Completions
   - Responses
   - More on the way

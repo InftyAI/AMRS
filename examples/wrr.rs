@@ -5,7 +5,7 @@ use tokio::runtime::Runtime;
 fn main() {
     let config = client::Config::builder()
         .provider("deepinfra")
-        .routing_mode(client::RouterMode::WRR)
+        .router_mode(client::RouterMode::WRR)
         .model(
             client::ModelConfig::builder()
                 .name("deepseek-ai/DeepSeek-V3.2")

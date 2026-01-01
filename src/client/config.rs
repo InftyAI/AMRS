@@ -84,7 +84,7 @@ pub struct Config {
     pub(crate) provider: String,
 
     #[builder(default = "RouterMode::Random")]
-    pub(crate) routing_mode: RouterMode,
+    pub(crate) router_mode: RouterMode,
     #[builder(default = "vec![]")]
     pub(crate) models: Vec<ModelConfig>,
 }
@@ -151,8 +151,8 @@ impl ConfigBuilder {
         }
 
         for model in self.models.as_ref().unwrap() {
-            if self.routing_mode.is_some()
-                && self.routing_mode.as_ref().unwrap() == &RouterMode::WRR
+            if self.router_mode.is_some()
+                && self.router_mode.as_ref().unwrap() == &RouterMode::WRR
                 && model.weight <= 0
             {
                 return Err(format!(
@@ -218,7 +218,7 @@ mod tests {
         assert!(valid_simplest_models_cfg.is_ok());
         assert!(valid_simplest_models_cfg.as_ref().unwrap().provider == DEFAULT_PROVIDER);
         assert!(valid_simplest_models_cfg.as_ref().unwrap().base_url == None);
-        assert!(valid_simplest_models_cfg.as_ref().unwrap().routing_mode == RouterMode::Random);
+        assert!(valid_simplest_models_cfg.as_ref().unwrap().router_mode == RouterMode::Random);
         assert!(valid_simplest_models_cfg.as_ref().unwrap().models.len() == 1);
         assert!(valid_simplest_models_cfg.as_ref().unwrap().models[0].base_url == None);
         assert!(valid_simplest_models_cfg.as_ref().unwrap().models[0].provider == None);

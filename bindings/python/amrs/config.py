@@ -55,7 +55,7 @@ class ModelConfig(BasicModelConfig):
     )
     weight: Optional[int] = Field(
         default=-1,
-        description="Weight of the model for ensemble methods. Only used if routing_mode is 'weighted'.",
+        description="Weight of the model for ensemble methods. Only used if router_mode is 'weighted'.",
     )
 
 
@@ -79,7 +79,7 @@ class RouterMode(str, Enum):
 
 class Config(BasicModelConfig):
     models: List[ModelConfig] = Field(description="List of model configurations")
-    routing_mode: RouterMode = Field(
+    router_mode: RouterMode = Field(
         default=RouterMode.RANDOM,
         description="Routing mode for the model, default is random.",
     )

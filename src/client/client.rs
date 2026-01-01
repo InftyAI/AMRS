@@ -24,7 +24,7 @@ impl Client {
 
         Self {
             providers: providers,
-            router: router::construct_router(cfg.routing_mode, cfg.models),
+            router: router::construct_router(cfg.router_mode, cfg.models),
         }
     }
 
@@ -81,7 +81,7 @@ mod tests {
             TestCase {
                 name: "weighted round-robin router",
                 config: Config::builder()
-                    .routing_mode(RouterMode::WRR)
+                    .router_mode(RouterMode::WRR)
                     .models(vec![
                         crate::client::config::ModelConfig::builder()
                             .name("model_a".to_string())

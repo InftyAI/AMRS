@@ -1,6 +1,6 @@
 [package]
 name = "arms"
-version = "0.0.1"
+version = "0.0.2"
 edition = "2024"
 
 description = "🧬 The adaptive model routing system for exploration and exploitation."
@@ -8,7 +8,6 @@ license = "MIT"
 repository = "https://github.com/InftyAI/AMRS"
 readme = "README.md"
 keywords = ["llmops", "ai-gateway", "ai-proxy", "sdk", "llm"]
-categories = ["router"]
 
 [dependencies]
 async-openai = { version = "0.31.1", features = ["_api", "response-types", "responses", "chat-completion"] }

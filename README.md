@@ -31,7 +31,7 @@ Run the following Cargo command in your project directory:
 
 Or add the following line to your Cargo.toml:
 
-`arms = "0.0.1"`
+`arms = "0.0.2"`
 
 ## How to Use
 

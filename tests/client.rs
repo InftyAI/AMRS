@@ -9,6 +9,31 @@ mod tests {
     use super::*;
 
     #[tokio::test]
+    async fn test_completion() {
+        from_filename(".env.integration-test").ok();
+
+        let config = client::Config::builder()
+            .provider("faker")
+            .model(
+                client::ModelConfig::builder()
+                    .name("fake-completion-model")
+                    .build()
+                    .unwrap(),
+            )
+            .build()
+            .unwrap();
+
+        let client = client::Client::new(config);
+        let request = chat::CreateChatCompletionRequestArgs::default()
+            .build()
+            .unwrap();
+
+        let response = client.create_completion(request).await.unwrap();
+        assert!(response.id.starts_with("fake-completion-id"));
+        assert!(response.model == "fake-completion-model");
+    }
+
+    #[tokio::test]
     async fn test_response() {
         from_filename(".env.integration-test").ok();
 
@@ -24,7 +49,7 @@ mod tests {
             .build()
             .unwrap();
 
-        let mut client = client::Client::new(config);
+        let client = client::Client::new(config);
         let request = responses::CreateResponseArgs::default()
             .input("tell me the weather today")
             .build()
@@ -45,7 +70,7 @@ mod tests {
             )
             .build()
             .unwrap();
-        let mut client = client::Client::new(config);
+        let client = client::Client::new(config);
         let request = responses::CreateResponseArgs::default()
             .model("gpt-3.5-turbo")
             .input("tell me a joke")
@@ -74,36 +99,11 @@ mod tests {
             )
             .build()
             .unwrap();
-        let mut client = client::Client::new(config);
+        let client = client::Client::new(config);
         let request = responses::CreateResponseArgs::default()
             .input("give me a poem about nature")
             .build()
             .unwrap();
         let _ = client.create_response(request).await.unwrap();
-    }
-
-    #[tokio::test]
-    async fn test_completion() {
-        from_filename(".env.integration-test").ok();
-
-        let config = client::Config::builder()
-            .provider("faker")
-            .model(
-                client::ModelConfig::builder()
-                    .name("fake-completion-model")
-                    .build()
-                    .unwrap(),
-            )
-            .build()
-            .unwrap();
-
-        let mut client = client::Client::new(config);
-        let request = chat::CreateChatCompletionRequestArgs::default()
-            .build()
-            .unwrap();
-
-        let response = client.create_completion(request).await.unwrap();
-        assert!(response.id.starts_with("fake-completion-id"));
-        assert!(response.model == "fake-completion-model");
     }
 }

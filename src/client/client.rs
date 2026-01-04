@@ -29,7 +29,7 @@ impl Client {
     }
 
     pub async fn create_response(
-        &mut self,
+        &self,
         request: responses::CreateResponse,
     ) -> Result<responses::Response, OpenAIError> {
         let candidate = self.router.sample();
@@ -39,7 +39,7 @@ impl Client {
 
     // This is chat completion endpoint.
     pub async fn create_completion(
-        &mut self,
+        &self,
         request: chat::CreateChatCompletionRequest,
     ) -> Result<chat::CreateChatCompletionResponse, OpenAIError> {
         let candidate = self.router.sample();

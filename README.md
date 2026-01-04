@@ -67,7 +67,7 @@ fn main() {
         .build()
         .unwrap();
 
-    let mut client = client::Client::new(config);
+    let client = client::Client::new(config);
     let request = chat::CreateChatCompletionRequestArgs::default()
         .messages([
             chat::ChatCompletionRequestSystemMessage::from("You are a helpful assistant.").into(),

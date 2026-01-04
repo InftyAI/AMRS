@@ -18,7 +18,7 @@ impl Router for RandomRouter {
         "RandomRouter"
     }
 
-    fn sample(&mut self) -> ModelName {
+    fn sample(&self) -> ModelName {
         let mut rng = rand::rng();
         let idx = rng.random_range(0..self.model_infos.len());
         self.model_infos[idx].name.clone()

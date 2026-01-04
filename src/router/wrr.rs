@@ -1,3 +1,5 @@
+use std::sync::atomic::AtomicI32;
+
 use crate::client::config::ModelName;
 use crate::router::router::{ModelInfo, Router};
 
@@ -5,7 +7,7 @@ pub struct WeightedRoundRobinRouter {
     total_weight: i32,
     model_infos: Vec<ModelInfo>,
     // current_weight is ordered by model_infos index.
-    current_weights: Vec<i32>,
+    current_weights: Vec<AtomicI32>,
 }
 
 impl WeightedRoundRobinRouter {
@@ -16,7 +18,7 @@ impl WeightedRoundRobinRouter {
         Self {
             model_infos: model_infos,
             total_weight: total_weight,
-            current_weights: vec![0; length],
+            current_weights: (0..length).map(|_| AtomicI32::new(0)).collect(),
         }
     }
 }
@@ -27,27 +29,28 @@ impl Router for WeightedRoundRobinRouter {
     }
 
     // Use Smooth Weighted Round Robin Algorithm.
-    fn sample(&mut self) -> ModelName {
+    fn sample(&self) -> ModelName {
         // return early if only one model.
         if self.model_infos.len() == 1 {
             return self.model_infos[0].name.clone();
         }
 
-        self.current_weights
-            .iter_mut()
-            .enumerate()
-            .for_each(|(i, weight)| {
-                *weight += self.model_infos[i].weight;
-            });
+        // 1. add weight to current weight.
+        self.model_infos.iter().enumerate().for_each(|(i, weight)| {
+            self.current_weights[i].fetch_add(weight.weight, std::sync::atomic::Ordering::Relaxed);
+        });
 
         let mut max_index = 0;
         for i in 1..self.current_weights.len() {
-            if self.current_weights[i] > self.current_weights[max_index] {
+            if self.current_weights[i].load(std::sync::atomic::Ordering::Relaxed)
+                > self.current_weights[max_index].load(std::sync::atomic::Ordering::Relaxed)
+            {
                 max_index = i;
             }
         }
 
-        self.current_weights[max_index] -= self.total_weight;
+        self.current_weights[max_index]
+            .fetch_sub(self.total_weight, std::sync::atomic::Ordering::Relaxed);
         self.model_infos[max_index].name.clone()
     }
 }
